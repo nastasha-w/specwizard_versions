@@ -1,0 +1,81 @@
+From parameter file examination: 
+using the equivalent of the make_maps_v3 'T4' option seems to be possible in principle, but may not work.
+the list of ions to include or not contains o7, but not o8; the non-self-shielded ion table directory does have an o8 option, but so does the SSH version
+
+readdata_owls gets the SFR (not OnEOS). 
+l 4095:
+  if(ignore_starforming) then
+    where(StarFormationRate .gt. 0) Mass = 0.d0 ! Particles on the EOS do not contribute
+  endif
+ignore_starforming read from parameter file, not present in the ones I used. default (modules) is false, confirmed by output hdf5 check
+setmaxt4sfgas and usestarforminggas are commented out in the parameter file and are not present in the modules or subroutines files 
+
+specwizard_modules.F90: atomic data does not contain an o8 entry. Added in.
+
+Also: auto naming only identifies snapshot; either make a tree for further identification or rename files after runs finish (otherwise, overwrites will happen!)
+
+runs: minor changes until something works (use last)
+
+-------------------------------------------
+resolution (line of sight number of pixels)
+-------------------------------------------
+
+default setting is                 vpixsizekms = 1.4
+projection standard resolution uses              0.22
+projection high resolution uses                  0.040 
+  should resolve Plummer equivalen gravitational softening length of 0.7 pkpc, and a bit higher resoltion than the 25 cMpc / 32000 pixels projection
+
+standardprojres in specwizard shows improvement of agreement with standard resolution projections
+hiprojres shows a bit more improvemnt, but the start of a tendancy of the projections to underestimate values (consistent with resolution difference)
+default + integrate_kernel: cubic spline kernel is not implemented for integration yet. Using gaussian kernel in stead.  
+
+
+-----------------
+los test versions
+-----------------
+
+test1:
+In resulting file, some of the total column densities seem to be considerably lower than the set minimum in the log file generation. Reinspection confirms that the pixel at the given fractional coordinates does match the selection in spectra 33, 34, though the deviation is only 0.13 dex in spectrum 35
+talk with Joop:  these just don't match
+
+tests 2,3:
+areas around sightlines from test 1, probed with 11x11 sightlines at standard resolution pixel centres, corners, and edges. Comparison with standard and higher-resolution projections confirma the mismatch
+
+test 4:
+Using the 25 Mpc box for faster iteration; using -DTOTALELT option, which does not include ion balances in totnr_ion calculations
+sightlines selected in 10 bins of total log N_H range, 8 sightlines per bin
+
+test 6,7,9:
+zoom region of 100 Mpc box, los selected to have ~ uniform column density coverage (by H, O, or O7/8 in projection maps)
+ 
+test 10:
+second zoom region of the 100 Mpc box, los slected to have a ~uniform column density coverage in O7 and O8
+
+grid1, run2, grid1b:
+128^2 uniform grid, centerd on pixels of the 32000^2 projection, for O7 and O8. Had mismatch issues similar to first versions, despite same los resolution
+
+grid1c:
+grid1 outputs using test10 sightlines
+
+-------------------
+specwizard versions
+-------------------
+
+Also added back in somewhere along the way: 
+option (run-time) to set star-forming gas to 10^4 K
+option (not sure if run-time or compile) to use ion fraction = 1 -> get total element column densities (spectra are pointless; used to debug in combination with column density maps)
+
+test1: 
+out of the box
+
+test2:
+O8 added in; initial addition version only used one line because number of lines parameter was set to 1 
+
+test3:
+number of O8 lines set to 2; TOTALELT compile option put in and used in ion number calculations
+curve of growth is still a better match to o8 largest doublet element fosc rather than (total) doublet value (correct: only the first given line is used. Tau ratios can be used to correct this.)
+
+test4:
+bug fix -- seems to work
+Set requireH = .true. default in modules -> always read in H element abundance -> use the right mass fractions in lognH for ion balance tables
+
