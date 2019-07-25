@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/cosmosim/!svn/ver/533/SpecWizard/src/eagle
+END
+read_eagle_fortran.f90
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/read_eagle_fortran.f90
+END
+test_c.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/test_c.c
+END
+test_fortran.f90
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/test_fortran.f90
+END
+_read_eagle.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/_read_eagle.c
+END
+read_eagle.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/read_eagle.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/cosmosim/!svn/ver/534/SpecWizard/src/eagle/Makefile
+END
+read_eagle.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/read_eagle.h
+END
+read_eagle_f.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/read_eagle_f.c
+END

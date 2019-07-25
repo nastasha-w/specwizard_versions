@@ -1,0 +1,369 @@
+\documentclass{report}
+\usepackage{fancyhdr}
+
+%------------------------------- Set style
+\pagestyle{fancy}
+ %\lhead{\nouppercase{\rightmark}}
+ \lhead[\fancyplain{}{\thepage}]         {\fancyplain{}{\rightmark}}
+ \rhead[\fancyplain{}{\rightmark}]       {\fancyplain{}{\thepage}}
+\rhead{\thepage}
+\cfoot{}
+\raggedright
+\usepackage{palatino}
+%------------------------------ Set fancy header and footer
+
+
+
+%------------------------------- Custom commands
+%Hide bullet points from itemized lists:
+\renewcommand{\labelitemi}{}
+
+%Define paramdefinition and paramdescription functions:
+\newcommand{\paramdefinition}[3]{
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+		{\tt #1} [{\sc #2}]& #3 \\
+\end{tabular*}}
+
+\newcommand{\paramdescription}[1]{
+\begin{itemize}
+\item #1
+\end{itemize}\vspace{0.2cm}}
+
+%------------------------------- The Document
+\begin{document}
+\begin{center}
+\thispagestyle{empty}
+ 
+ %Front cover:
+ \vspace{20cm}
+\begin{Huge}SpecWizard User Guide\end{Huge}
+\vspace{5cm}\linebreak
+
+\begin{Large}Joop Schaye\linebreak\end{Large}
+{\large schaye@strw.leidenuniv.nl}\vspace{0.5cm}\linebreak
+\begin{Large}Tom Theuns\linebreak\end{Large}
+{\large tom.theuns@durham.ac.uk}\vspace{0.5cm}\linebreak
+\begin{Large}Craig Booth\linebreak\end{Large}
+{\large booth@strw.leidenuniv.nl}
+\vspace{8cm}\linebreak
+\today
+\end{center}
+\pagebreak
+\tableofcontents
+
+\chapter{How to Run SpecWizard}
+
+SpecWizard can run in either serial or parallel mode.  To run in serial mode, just run the executable with an optional command line parameter that specifies the parameter filename:
+\linebreak\linebreak
+{\tt ./specwizard [mypars.par]}
+\linebreak\linebreak
+To run in parallel mode, ensure that the code is compiled with the -DMPI flag set, and then run it like a standard MPI program:
+\linebreak\linebreak
+{\tt mpirun -np 5 ./specwizard [mypars.par]}
+\linebreak\linebreak
+
+\chapter{Parameters}
+
+By default specwizard looks for an ascii file called {\tt
+  specwizard.par} in the current directory and reads parameters from
+there.  If the command line argument is not present then SpecWizard
+searches by default for a parameter file in the current directory
+named {\tt specwizard.par}.  This section contains a complete list and
+description of the parameters.  Where units may be important for a
+parameter they are shown on the right hand side of the page, the
+subscript ${\odot}$ represents solar values.  If any parameters remain
+uninitialized then SpecWizard will crash on startup.  \linebreak
+
+\section{Basic Runtime Control}
+
+\paramdefinition{do\_long\_spectrum}{logical}{}
+\paramdescription{If T then we generate a long spectrum by patching together spectra from different redshifts into one composite spectrum (long spectrum mode).  If F then we generate a single spectrum along an individual LOS (short spectrum mode)}
+
+\paramdefinition{nspec}{integer}{}
+\paramdescription{Number of spectra to create.  For short spectra this generates the first {\tt nspec} spectra per LOS file. If there are insufficient sightlines in the LOS file, nspec is reduced. For long spectra this is the total number of long spectra to generate}
+
+
+\section{Files and Directories}
+
+\paramdefinition{ibdir}{string}{}
+\paramdescription{Location of HDF5 file containing ionization fractions of each species as a function of redshift, density and temperature}
+
+\paramdefinition{datadir}{string}{}
+\paramdescription{Location of the data files.  n.b. This directory must contain (in addition to LOS files) an ascii text file with name specified by the {\tt file\_list} variable.  This file must contain a list of los files that SpecWizard is allowed to use. OR if use\_snapshot\_file is true, this must be the directory containing the snapshot directory.}
+
+\paramdefinition{use\_snapshot\_file}{logical}{}
+\paramdescription{If this is true then instead of using LOS files, SpecWizard works with snapshot files}
+
+\paramdefinition{snap}{int}{}
+\paramdescription{If use\_snapshot\_file is true, then SW needs to know the snapshot number explicitly.}
+
+\paramdefinition{use\_random\_los}{logical}{}
+\paramdescription{If we are using a snapshot file then we have the option of specifying LOS coordinates.  If this is T then LOS coordinates are random, if it is F then LOS coordinates are drawn from the file {\tt los\_coordinates\_file}}
+
+\paramdefinition{los\_coordinates\_file}{string}{}
+\paramdescription{An ascii file containing LOS coordinates for SW. The first line simply contains the number of coordinates in the file. The rest of the file has 5 columns: x y z phi theta}
+
+\paramdefinition{file\_list}{string}{}
+\paramdescription{An ascii file called {\tt file\_list} must be present inside of {\tt datadir}.  This file must contain a list of LOS files, with one file per line.  If this file is not present SpecWizard will crash.}
+
+\paramdefinition{outputdir}{string}{}
+\paramdescription{Directory to write output data to}
+
+\paramdefinition{output\_frequency}{string}{}
+\paramdescription{If T then write frequencies to output files, if F then work with wavelengths}
+
+\paramdefinition{gimic}{logical}{}
+\paramdescription{If F then we are using OWLS simulations; if T then we are using GIMIC}
+
+\paramdefinition{overwrite}{logical}{}
+\paramdescription{If F then if the output file already exists SpecWizard will crash.  If T then old files will be overwritten}
+
+\paramdefinition{urchin}{logical}{}
+\paramdescription{If T then read the neutral fraction for H1 (Si2) from post-processed snapshot files rather than lookup the ionization balance}
+
+\paramdefinition{urchindir}{string}{}
+\paramdescription{If urchin: The directory containing the post-processed snapshot files}
+
+\paramdefinition{use\_urchin\_temperature}{logical}{}
+\paramdescription{If urchin: If T then read the particle temperatures from post-processed snapshot files rather than use the simulation temperature}
+
+\section{Output Control}
+
+\paramdefinition{SpectrumFile}{string}{}
+\paramdescription{If stated, this output filename is used rather than automatic filename generation.}
+
+\paramdefinition{output\_zspaceopticaldepthweighted\_values}{logical}{ }
+\paramdescription{For both long and short spectra. Output, separately for each ion, redshift space quantities weighted by contribution to the optical depth, the quantities that are written out are:  Optical depth of strongest transition, overdensity and temperature (K)}
+
+\paramdefinition{output\_realspacemassweighted\_values}{logical}{ }
+\paramdescription{Only for short spectra, output real space, mass weighted quantities along the sightline.  The quantities that are written out are: LOS peculiar velocity (km/s), metal mass fraction, overdensity and temperature (K)}
+
+\paramdefinition{output\_realspacenionweighted\_values}{logical}{ }
+\paramdescription{Only for short spectra, output real space N$_{ion}$ weighted values separately for each ion.  The quantities that are written out are: LOS peculiar velocity (km/s), Nion (cm$^{-3}$), overdensity and temperature (K)}
+
+\section{Control of Ions}
+
+\paramdefinition{ibfactor}{real}{}
+\paramdescription{Factor to rescale ionizing background with: $I_{UV} = I_{UV}\times{\tt ibfactor}$ (only used for calculation of the ionization balance)}
+
+\paramdefinition{doH1}{logical}{}
+\paramdescription{If T then consider H1 when calculating spectra.  Other ions are switched on and off using the other flags: {\tt doHe2}, {\tt doC2}, {\tt doC3}, {\tt doC4}, {\tt doN2}, {\tt doN5}, {\tt doO1}, {\tt doO6}, {\tt doO7}, {\tt doO8}, {\tt doNe8}, {\tt doNe9}, {\tt doMg2}, {\tt doSi3}, {\tt doSi4}, {\tt doFe2}, {\tt do21cm}.  All of these parameters must be set (n.b. He2 = He{\sc ii}=He$^+$)}
+
+\paramdefinition{doall}{logical}{}
+\paramdescription{If T then override all other ion flags and force SpecWizard to consider all currently implemented ions}
+
+\paramdefinition{subtract\_Hmol}{logical}{}
+\paramdescription{If urchin is T, then this option controls how to interpret the ionic fraction of Si2. Either (subtract\_Hmol=T) X\_Si2 = X\_H1 or (subtract\_Hmol=F) X\_Si2 = X\_H1 + X\_Hmol}
+
+\section{Metal Abundance Modification}
+\paramdefinition{modify\_metallicity}{logical}{ }
+\paramdescription{If this is true then modify the simulation metal abundances, in one of a number of ways described by the parameters in this section.  If this is F then all further variables in this section are ignored, and the simulation abundances are used}
+
+\paramdefinition{use\_smoothed\_abundance}{logical}{}
+\paramdescription{If true, reads the smoothed element abundance in place of the true element abundance}
+
+\paramdefinition{maxz\_rel}{real}{Z$_{\odot}$}
+\paramdescription{If either {\tt impose\_z\_rho\_relation} or {\tt log\_normal\_scatter} are T, then limit the maximum metallicity with this parameter.  $Z_{\odot}$ is hardcoded into the source file specwizard\_modules.F90, and has a value of 0.0126637  (=$M_{Metal,\odot}/M_{tot,\odot}$}
+
+\paramdefinition{scale\_simulation\_abundances}{logical}{ }
+\paramdescription{Scale simulation metallicity by a scalar factor?}
+
+\paramdefinition{z\_rel}{real}{Z$_{\odot}$}
+\paramdescription{Scalar factor by which to scale metallicity, used only if {\tt scale\_simulation\_abundances} is T.   $Z_{\odot}$ is hardcoded into the source file specwizard\_modules.F90, and has a value of 0.0126637  (=$M_{Metal,\odot}/M_{tot,\odot}$}
+
+\paramdefinition{ZC\_rel}{real}{}
+\paramdescription{Scale carbon abundances by this linear value relative to their original abundance.  Other metals are scaled by the parameters: {\tt ZN\_rel},{\tt ZO\_rel},{\tt ZNe\_rel},{\tt ZMg\_rel},{\tt ZSi\_rel},{\tt ZFe\_rel}.  All of which must be set.  Used only if {\tt modify\_metallicity} is T.  These parameters are used to change the relative abundances of different elements.}
+
+\paramdefinition{impose\_z\_rho\_relation}{logical}{ }
+\paramdescription{ impose metallicity $z = {\tt z\_mean} (\rho/\rho_{mean})^{{\tt z\_index}}$, up to maximum metallicity {\tt maxz\_rel}, $\rho_{mean}$ is the mean baryonic density of the Universe}
+
+\paramdefinition{z\_index}{real}{ }
+\paramdescription{Power-law index of $\rho$-Z relation, used only if {\tt impose\_z\_rho\_relation} is T}
+
+\paramdefinition{z\_mean}{real}{Z$_{\odot}$}
+\paramdescription{Metallicity at mean density, if we are imposing a $\rho$-Z relation, used only if {\tt impose\_z\_rho\_relation} is T}
+
+\paramdefinition{log\_normal\_scatter}{logical}{ }
+\paramdescription{If true, Divide computational volume in ({\tt z\_sig\_bin})$^3$ cells, and add lognormal metallicity with {\tt z\_sig\_dex} scatter to particles in each cell}
+
+\paramdefinition{z\_sig\_bin}{integer}{}
+\paramdescription{Number of cells to divide the computational volume into, if we are imposing a lognormal metallicity scatter, used only if {\tt log\_normal\_scatter} is T}
+
+\paramdefinition{z\_sig\_dex}{real}{}
+\paramdescription{If we are adding a lognormal metallicity scatter to each particle, then in solar units, $\log(Z) \rightarrow \log(Z)+\Sigma {\tt z\_sig\_dex}$, where $\Sigma$ is a Gaussian deviate with mean 0, standard deviation=1, which is selected independently for each of the ({\tt z\_sig\_bin})$^3$ cells. Used only if {\tt log\_normal\_scatter} is T}
+
+\section{Noise Statistics}
+\paramdefinition{generate\_noise}{logical}{}
+\paramdescription{Generate a noise array?  If this is true then in addition to the 'Flux' variable written for each spectrum (which always contains a noise-free spectrum), there are two additional arrays written out: 'Noise\_Sigma' (standard deviation of the noise at each pixel), and 'Gaussian\_deviate' (mean=0, sigma=1 Gaussian random number for each pixel)}
+
+\paramdefinition{use\_noise\_file}{logical}{}
+\paramdescription{If T then use file describing sigma as a function of flux and wavelength.  If F then use {\tt sigtonoise} and {\tt minnoise} to generate Gaussian noise.  This option works in long spectrum mode only.}
+
+\paramdefinition{noisefile}{string}{}
+\paramdescription{If we are using noise from a file, load in {\tt noisefile}, an HDF5 file that describes the standard deviation of the noise as a function of wavelength and flux.  Note that this noise file can be created from observations using the {\tt noisestat.pro} IDL script included in the {\tt Noise/} subdirectory of the SpecWizard distribution.}
+
+\paramdefinition{sigtonoise}{real}{}
+\paramdescription{If {\tt use\_noise\_file} is false then this is the signal to noise ratio for the Gaussian noise: sigma = {\tt minnoise} + (1/{\tt sigtonoise} - {\tt minnoise}) * flux}
+
+\paramdefinition{minnoise}{real}{}
+\paramdescription{If {\tt use\_noise\_file} is false then this is the minimum noise level, normalized to the continuum, for the Gaussian noise: sigma = {\tt minnoise} + (1/{\tt sigtonoise} - {\tt minnoise}) * flux}
+
+\section{Accuracy Parameters}
+
+\paramdefinition{minbother\_blue}{real}{}
+\paramdescription{Accuracy parameter, minimum optical depth to consider for transitions with rest-frame wavelength shorter than that of H{\sc i} Ly$\alpha$.  The smaller this number the more accurate the results, but the slower the code will run.}
+
+\paramdefinition{minbother\_red}{real}{}
+\paramdescription{Accuracy parameter, minimum optical depth to consider for transitions with rest-frame wavelength longer than that of H{\sc i} Ly$\alpha$.  The smaller this number the more accurate the results, but the slower the code will run.}
+
+\paramdefinition{vpixsizekms}{real}{km/s}
+\paramdescription{Pixel size in km/s.  For short spectra this represents the final output pixel size.  for long spectra this represents the pixel size before rebinning into. SpecWizard will stop if this is too small compared with the other parameters. The smaller this number the more accurate the results, but the slower the code will run.}
+
+\section{Parameters For Long Spectrum}
+\paramdefinition{zqso}{real}{}
+\paramdescription{Redshift of the QSO}
+
+\paramdefinition{minlambda}{real}{\AA{}}
+\paramdescription{Minimum observed wavelength in final spectrum}
+
+\paramdefinition{minlambda}{real}{\AA{}}
+\paramdescription{Maximum observed wavelength in final spectrum}
+
+\paramdefinition{zabsmin}{real}{}
+\paramdescription{Minimum allowed absorption redshift}
+
+\paramdefinition{zabsmax}{real}{}
+\paramdescription{Maximum allowed absorption redshift.  If {\tt zabsmax} > {\tt zqso} then {\tt zabsmax} is set equal to {\tt zqso}}
+
+\paramdefinition{nlyman}{integer}{}
+\paramdescription{Number of Lyman lines to include (1 = Ly-alpha, 2 = Ly-beta, etc.; neg. value = use nlyman\_all = 31)}
+
+\paramdefinition{fzresol}{real}{}
+\paramdescription{Bin size for simulation LOS files: dz = fzresol*(1+z). Sight lines are drawn from files with z\_file = z +/- {\tt fzresol}(1+z)/2, where $z$ is the current redshift.}
+
+\paramdefinition{pixsize}{real}{\AA{}}
+\paramdescription{Pixel size of final spectrum}
+
+\paramdefinition{do\_convolve\_spectrum}{logical}{}
+\paramdescription{If T then convolve final spectrum with an instrumental broadening of {\tt fwhm} km/s}
+
+\paramdefinition{fwhm}{real}{km/s}
+\paramdescription{FWHM of instrumental broadening (Gaussian), used only if {\tt do\_convolve\_spectrum} is T}
+
+
+\chapter{Structure of Output Files}
+
+Output files are HDF5, and so are organized hierarchically.  At the top level there are four header groups (Units, Constants, Parameters, Header).
+
+\begin{description}
+   \item[Units] Conversion factors between original SPH simulation units and cgs.  Whilst using SpecWizard you should not need anything in this group!
+   \item[Constants] Physical constants
+   \item[Parameters] Parameters from specwizard.par
+   \item[Header] The Header data from the simulation.  Contains information on cosmology, etc.
+\end{description}  
+
+At the top level there are in addition to the four header groups one
+additional group for each spectrum (for spectrum number $N$ this is
+called {\tt SpectrumN}), and a dataset that contains either
+Wavelengths ({\tt Wavelength\_Ang}. for long spectra), or Hubble
+expansion velocities, corresponding to a physical coordinate ({\tt
+  VHubble\_KMpS} for short spectra).  The contents of the individual
+spectrum groups will be treated separately for short and long spectra:
+
+\section{Short Spectra}
+
+Each spectrum group contains a sub-group for each ion
+(e.g. {\tt /Spectrum1/c4/}), this group contains a scalar dataset
+({\tt LogColumnDensity}) containing the integrated column density of
+that ion, and an array, ({\tt Optical Depth}), containing the optical
+depth of that ion as a function of hubble velocity.
+
+If {\tt output\_realspacemassweighted\_values} is true then each
+spectrum group contains a sub-group called {\tt
+  RealSpaceMassWeighted}, containing real space physical properties
+(i.e. as a function of Hubble velocity), weighted by mass.  These
+arrays are
+
+\begin{itemize}
+\item LOSPeculiarVelocity\_KMpS
+\item MetalMassFraction
+\item OverDensity
+\item Temperature\_K
+\end{itemize}
+
+If {\tt output\_zspaceopticaldepthweighted\_values} was set to true
+then there is an additional subgroup called {\tt
+  RedshiftSpaceOpticalDepthWeighted}, which contains
+
+\begin{itemize}
+\item OverDensity
+\item Temperature\_K
+\end{itemize}
+
+These are arrays of densities and temperatures, with particle properties weighted by the optical depth they contribute to each pixel.  If {\tt output\_realspacenionweighted\_values} is set then there is another additional subgroup, called {\tt RealSpaceNionWeighted}, which contains the following arrays:
+
+\begin{itemize}
+\item LOSPeculiarVelocity\_KMpS
+\item NIon\_CM3
+\item OverDensity
+\item Temperature\_K
+\end{itemize}
+
+These are real space quantities, weighted by Nion.  Warning!  If all optional output is generated then output dataset can become very large!
+
+\section{Long Spectra}
+
+Each spectrum group contains an array, {\tt Flux}, containing the total normalized, transmitted flux as a function of wavelength.  If noise has been specified then two additional arrays are present, called {\tt Gaussian\_deviate} and {\tt Noise\_Sigma}.  An additional group, called {\tt ShortSpectraInfo} contains information so that the exact lines of sight used from the LOS files may be looked up.  Finally, the spectrum group contains a sub-group for each individual ion, if {\tt output\_zspaceopticaldepthweighted\_values} is true then this group contains the following arrays:
+
+\begin{itemize}
+\item RedshiftSpaceOpticalDepthOfStrongestTransition
+\item RedshiftSpaceOpticalDepthWeightedOverDensity
+\item RedshiftSpaceOpticalDepthWeightedTemperature\_K
+\item LogColumnDensity
+\end{itemize}
+
+Each of the arrays is of the same size as {\tt /Wavelength\_Ang}, and describes the overdensity and temperature of each pixel, where gas particle properties have been weighted by their contribution to the optical depth.
+
+\section{Normalised Gaussians}
+We use error functions instead of the M4 kernel to obtain integrals over bins. To do so we replace the M4 SPH spline with a function which is a produce of 1D Gaussians,
+\begin{equation}
+G(x,y,z) = \left({1\over (2\pi \sigma^2)^{1/2}}\,\exp(-x^2/(2\sigma^2)\right)(x\rightarrow y)((x\rightarrow z)\,.
+\end{equation}
+We choose the relation between $\sigma$ and $h$ such that the functions have the same value at zero lag, so that
+\begin{eqnarray}
+(2\pi\sigma^2)^{3/2} &=& {\pi h^3\over 8}\nonumber\\
+2\sigma^2 &=& {h^2\over 4 \pi^{1/3}}\nonumber\\
+{h\over 2^{1/2}\sigma} &=& 2\,\pi^{1/6}\,.
+\end{eqnarray}
+
+Next we want the integral of $G$ over a cube with side $2h$ to be unity. So the 1D \lq truncated\rq\ Gaussian we actually use is
+\begin{equation}
+G(x) = {{\cal N}\over (2\pi \sigma^2)^{1/2}}\exp(-x^2/(2\sigma^2))\,
+\end{equation}
+and we determine ${\cal N}$ such that $\int_{-h}^{h}\,G(x)\,dx=1$, which yields
+\begin{equation}
+{\cal N} = {1\over 2\,{\rm erf}(2\,\pi^{1/6})}\,,
+\end{equation}
+where the error function is
+\begin{equation}
+{\rm erf}(x) \equiv {2\over \pi^{1/2}}\,\int_0^x\,\exp(-t^2)\,dt\,.
+\end{equation}
+
+A 1D column density integral for a sightline at impact parameter $b$ is then
+\begin{eqnarray}
+{\cal C} &=& \left({{\cal N}\over (2\pi \sigma^2)^{1/2}}\right)^3\,\exp(-b^2/(2\sigma^2))\,2\,\int_0^{z_+}\,\exp(-z^2/(2\sigma^2))\,dz\,\nonumber\\
+&=& {{\cal N}^3\over (2\pi\sigma^2\,a^2)}\,\times \exp(-b^2/(2\sigma^2))\,{\rm erf}(z_+/(2\sigma^2)^{1/2})\nonumber\\
+z_+ &\equiv & (h^2-b^2)^{1/2}\,.
+\end{eqnarray}
+Note the appearance of the expansion factor $a$ so that the result is a physical column-density (as opposed to a co-moving one).
+
+
+The mass corresponding to square pixel is then
+\begin{eqnarray}
+{\cal I} &=& \left({{\cal N}\over (2\pi\sigma^2)^{1/2}}\right)^3\,\left[\int_{x_1}^{x_2}\exp(-(x-x_0)^2/(2\sigma^2))\,dx\right]\times\left[x\rightarrow y\right]\left[\int_{-\infty}^\infty \exp(-(z-z_0)^2/(2\sigma^2))\,dz\right]\nonumber\\
+&=&{\cal N}^2\,\left[{1\over 2}\,({\rm erf}((x_2-x_0)/(2\sigma^2)^{1/2})-{1\over 2}{\rm erf}((x_1-x_0)/(2\sigma^2)^{1/2})\right]\times\left[x\rightarrow y\right]\,,
+\end{eqnarray}
+and the corresponding mean column density is $\bar{\cal C}={\cal I}/(a\,dx)^2$, again multiplying by the scale factor $a$ to obtain a physical column density.
+
+
+\end{document}

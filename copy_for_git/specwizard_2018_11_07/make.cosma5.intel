@@ -1,0 +1,25 @@
+# compiler options for cosma5
+#
+# FC  # is defined via the loaded module
+FC = mpif90
+
+# define a few sets of flags
+
+FFLAGS_DEBUG     = -g -check bounds 
+FFLAGS_OPTIMIZED = -O3 -xHOST -openmp
+
+FDEBUG     = $(FFLAGS_DEBUG)
+FOPTIMIZED = $(FFLAGS_OPTIMIZED)
+
+ISLIB= -L
+ISINC= -I
+ISMOD= -I
+ISRLIB= -Wl,-rpath=
+INC   = 
+# all the hdf5 linking is taken care of via the modules
+
+HDF_MOD= $(F90_MODULE_FLAGS) $(LDFLAGS)
+# HDF_LIB=/usr/lib64
+# HDFW_MOD=/home/galtay/opt/hdf5-1.8.9-gfortran-4.7.2/lib
+# HDFW_LIB=/home/galtay/opt/hdf5-1.8.9-gfortran-4.7.2/lib
+
