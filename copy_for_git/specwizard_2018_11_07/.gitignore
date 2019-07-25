@@ -2,6 +2,9 @@
 */los/*
 */parameterfiles/*
 
+# backups
+*~
+
 ## github c default, include /mod and .o that Fortran90 gets
 # Prerequisites
 *.d
