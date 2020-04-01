@@ -7,7 +7,7 @@
 ibdir           = ../../Ali_Spec_src/IonizationTables/HM01G+C/
 
 %Directory containing LOS files:
-datadir         = /cosma5/data/Eagle/ScienceRuns/Planck1/L0100N1504/PE/REFERENCE/data/snapshot_027_z000p101/
+datadir         = /cosma7/data/Eagle/ScienceRuns/Planck1/L0100N1504/PE/REFERENCE/data/snapshot_027_z000p101/
 %/cosma5/data/Eagle/ScienceRuns/Planck1/L0100N1504/PE/REFERENCE/data/snapshot_012_z003p017/
 %/cosma5/data/Eagle/ScienceRuns/Planck1/L0025N0188/PE/REFERENCE/data/snapshot_012_z003p017/
 %snap_base is the snapshot base name (without number) for EAGLE sims
