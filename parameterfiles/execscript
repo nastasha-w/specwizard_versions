@@ -1,0 +1,9 @@
+#!/bin/sh
+logdir="/net/luttero/data2/specwizard_data/sample3_first16_test/"
+
+out="$logdir""stdout" 
+err="$logdir""stderr" 
+echo "$out"
+echo "$err"
+
+../specwizard L0100N1504-sample3-first16_test.par > $out 2> $err
