@@ -421,7 +421,7 @@ module spectra
   logical            :: ibfactor_he_reionization = .false.
   !
   ! integration of the spectra
-  logical            :: limsigma = .false.! Only follow profiles until negligible?
+  logical            :: limsigma = .true.! Only follow profiles until negligible?
   !
   real(kind=doubleR) :: pixsize = invalid_R, fwhm = invalid_R ! Pix size in A, FWHM in km/s
   !

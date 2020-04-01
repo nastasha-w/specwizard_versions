@@ -3694,7 +3694,7 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   if(limsigma)then
     call hdf5_write_attribute(file_handle,trim(GroupName)//'/limsigma','TRUE')
   else
-   call hdf5_write_attribute(file_handle,trim(GroupName)//'/limsigma','FALSE')
+    call hdf5_write_attribute(file_handle,trim(GroupName)//'/limsigma','FALSE')
   endif
   if(integrate_thermprof_exactly)then
      call hdf5_write_attribute(file_handle, trim(GroupName)//'/Integrate_thermprof_exactly', 'TRUE')
