@@ -184,6 +184,10 @@ contains
           doC3 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doC4') then
           doC4 = read_logical(inline(first(3):last(3)))
+        else if (parm == 'doC5') then
+          doC5 = read_logical(inline(first(3):last(3)))
+        else if (parm == 'doC6') then
+          doC6 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doN2') then
           doN2 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doN3') then
@@ -192,6 +196,10 @@ contains
           doN4 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doN5') then
           doN5 = read_logical(inline(first(3):last(3)))
+        else if (parm == 'doN6') then
+          doN6 = read_logical(inline(first(3):last(3)))
+        else if (parm == 'doN7') then
+          doN7 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doO1') then
           doO1 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doO3') then
@@ -214,6 +222,8 @@ contains
           doAl3 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doNe8') then
           doNe8 = read_logical(inline(first(3):last(3)))
+        else if (parm == 'doNe9') then
+          doNe9 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doSi2') then
           doSi2 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doSi3') then
@@ -226,6 +236,12 @@ contains
           doFe2 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doFe3') then
           doFe3 = read_logical(inline(first(3):last(3)))
+        else if (parm == 'doFe17') then
+          doFe17 = read_logical(inline(first(3):last(3)))
+        else if (parm == 'doFe19') then
+          doFe19 = read_logical(inline(first(3):last(3)))
+        else if (parm == 'doFe21') then
+          doFe21 = read_logical(inline(first(3):last(3)))
         else if (parm == 'do21cm') then
           do21cm = read_logical(inline(first(3):last(3)))
         else if (parm == 'read_part_ids_from_file') then
@@ -241,10 +257,14 @@ contains
             doC2   =.true.
             doC3   =.true.
             doC4   =.true.
+            doC5   =.true.
+            doC6   =.true.
             doN2   =.true.
             doN3   =.true.
             doN4   =.true.
             doN5   =.true.
+            doN6   =.true.
+            doN7   =.true.
             doO1   =.true.
             doO3   =.true.
             doO4   =.true.
@@ -256,12 +276,16 @@ contains
             doAl2  =.true.
             doAl3  =.true.
             doNe8  =.true.
+            doNe9  =.true.
             doSi2  =.true.
             doSi3  =.true.
             doSi4  =.true.
             doS5   =.true.
             doFe2  =.true.
             doFe3  =.true.
+            doFe17 =.true.
+            doFe19 =.true.
+            doFe21 =.true.
             do21cm =.true.
           endif
           !
@@ -1365,6 +1389,7 @@ subroutine zero_spectra()
   temp_z_ion_long      = 0.d0
   rho_z_ion_long       = 0.d0
   temp_ion_long        = 0.d0
+  rho_ion_long         = 0.d0
   n_ion_long           = 0.d0
   temp_long            = 0.d0
   rho_long             = 0.d0
@@ -1416,6 +1441,7 @@ subroutine projectdata()
   ! real-space quantities
   n_ion     = 0.0  ! number density
   temp_ion  = 0.0  ! number dens weighted temperature
+  rho_ion   = 0.0  ! number dens weighted density
   veloc_ion = 0.0  ! number dens weighted velocity
   !
   ! Redshift interpolation for ionizing background
@@ -1689,6 +1715,8 @@ subroutine projectdata()
             n_ion(:,j)     = n_ion(:,j)     + kernel_factor * totnr_ion(:)
             veloc_ion(:,j) = veloc_ion(:,j) + kernel_factor * totnr_ion(:) * vr 
             temp_ion(:,j)  = temp_ion(:,j)  + kernel_factor * totnr_ion(:) * ParticleTemperature(i)
+            ! Particle Density n_H = cgs, rescaled for long spectra -> Particle cgs rho
+            rho_ion(:,j)   = rho_ion(:,j)   + kernel_factor * totnr_ion(:) * Density * proton_mass / MassFractions(H_index,i) 
             ! .... weighted by mass
             rho_tot(j)     = rho_tot(j)     + kernel_factor * Mass(i)
             veloc_tot(j)   = veloc_tot(j)   + kernel_factor * Mass(i) * vr
@@ -1713,7 +1741,8 @@ subroutine projectdata()
     do i = 1, nveloc
       if (n_ion(ii,i) .gt. 0.) then 
         veloc_ion(ii,i) = veloc_ion(ii,i) / n_ion(ii,i)
-        temp_ion(ii,i) = temp_ion(ii,i) / n_ion(ii,i)
+        temp_ion(ii,i)  = temp_ion(ii,i) / n_ion(ii,i)
+        rho_ion(ii,i)   = rho_ion(ii,i) / n_ion(ii,i) ! rho_ion was already cgs
       endif
       n_ion(ii,i) = n_ion(ii,i) * DensCon ! ions/cm^3
     enddo
@@ -2176,6 +2205,7 @@ subroutine allocate_spectra_short()
   if(allocated(n_ion)) deallocate(n_ion)
   if(allocated(temp_ion)) deallocate(temp_ion)
   if(allocated(veloc_ion)) deallocate(veloc_ion)
+  if(allocated(rho_ion)) deallocate(rho_ion)
   !
   if(allocated(tau)) deallocate(tau)
   if(allocated(normw)) deallocate(normw)
@@ -2201,7 +2231,7 @@ subroutine allocate_spectra_short()
   if(allocated(turbulence)) deallocate(turbulence)
   !
   allocate(rho_tot(nveloc),temp_tot(nveloc),met_tot(nveloc),veloc_tot(nveloc))
-  allocate(n_ion(nion,nveloc),temp_ion(nion,nveloc),veloc_ion(nion,nveloc))
+  allocate(n_ion(nion,nveloc),temp_ion(nion,nveloc),veloc_ion(nion,nveloc),rho_ion(nion,nveloc))
   allocate(tau(nveloc),normw(nveloc),work(nveloc),work2(nveloc),vhubble(nveloc),cdens(nveloc),&
     rhow(nveloc),tempw(nveloc),voc(nveloc),vocsim(nveloc),turbulence(nveloc),velocw(nveloc),nionw(nveloc))
   allocate(tau_ion(nion,nveloc),flux_ion(nion,nveloc))
@@ -2306,11 +2336,12 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
 
     ! write hubble velocity
     VarName = 'VHubble_KMpS'
-    call hdf5_write_data(file_handle, VarName, vhubble)
+    ! last argument: compression 1-9 normal compression, more and more, +10: more clever compression mechanisms
+    call hdf5_write_data(file_handle, VarName, vhubble, gzip=16)
 
     ! write projection parameters
-    call hdf5_write_data(file_handle,'Projection/x_fraction_array',x_fraction_array)
-    call hdf5_write_data(file_handle,'Projection/y_fraction_array',y_fraction_array)
+    call hdf5_write_data(file_handle,'Projection/x_fraction_array',x_fraction_array, gzip=16)
+    call hdf5_write_data(file_handle,'Projection/y_fraction_array',y_fraction_array, gzip=16)
     call hdf5_write_attribute(file_handle,'Projection/nspec',nspec)
     !
   endif
@@ -2345,13 +2376,13 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
       ElementGroup = trim(GroupName)//'/'//trim(ions(ion))//'/RedshiftSpaceOpticalDepthWeighted'
       call hdf5_create_group(file_handle, ElementGroup)
       VarName = trim(ElementGroup)//'/'//'LOSPeculiarVelocity_KMpS'
-      call hdf5_write_data(file_handle, trim(VarName),veloc_z_ion(ion,:))
+      call hdf5_write_data(file_handle, trim(VarName),veloc_z_ion(ion,:), gzip=16)
       VarName = trim(ElementGroup)//'/'//'NIon_CM3'
-      call hdf5_write_data(file_handle, trim(VarName),nion_z_ion(ion,:))
+      call hdf5_write_data(file_handle, trim(VarName),nion_z_ion(ion,:), gzip=16)
       VarName = trim(ElementGroup)//'/'//'OverDensity'
-      call hdf5_write_data(file_handle, trim(VarName),rho_z_ion(ion,:))
+      call hdf5_write_data(file_handle, trim(VarName),rho_z_ion(ion,:), gzip=16)
       VarName = trim(ElementGroup)//'/'//'Temperature_K'
-      call hdf5_write_data(file_handle, trim(VarName),temp_z_ion(ion,:))
+      call hdf5_write_data(file_handle, trim(VarName),temp_z_ion(ion,:), gzip=16)
     enddo
   endif
   !
@@ -2362,16 +2393,16 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
       call hdf5_create_group(file_handle, ElementGroup)
       ! Real space, n_ion-weighted LOS velocity
       VarName = trim(ElementGroup)//'LOSPeculiarVelocity_KMpS'
-      call hdf5_write_data(file_handle, trim(VarName),veloc_ion(ion,:))
+      call hdf5_write_data(file_handle, trim(VarName),veloc_ion(ion,:), gzip=16)
       ! Real space, pixel n_ion
       VarName = trim(ElementGroup)//'NIon_CM3'
-      call hdf5_write_data(file_handle, trim(VarName),n_ion(ion,:))
+      call hdf5_write_data(file_handle, trim(VarName),n_ion(ion,:), gzip=16)
       ! Real space, n_ion.-weighted overdensity
       VarName = trim(ElementGroup)//'OverDensity'
-      call hdf5_write_data(file_handle,trim(VarName),n_ion(ion,:)*ion_mass(ion)/rhocb)
+      call hdf5_write_data(file_handle,trim(VarName),rho_ion(ion,:)/rhocb, gzip=16) !Old version: n_ion(ion,:)*ion_mass(ion)/rhocb
       ! Real space, n_ion-weighted temperature. 
       VarName = trim(ElementGroup)//'Temperature_K'
-      call hdf5_write_data(file_handle, trim(VarName),temp_ion(ion,:))
+      call hdf5_write_data(file_handle, trim(VarName),temp_ion(ion,:), gzip=16)
     enddo
   endif
   !
@@ -2380,20 +2411,20 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
     MassWeightedGroup = trim(GroupName)//'/RealSpaceMassWeighted'
     call hdf5_create_group(file_handle, MassWeightedGroup)
     VarName      = trim(MassWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
-    call hdf5_write_data(file_handle,trim(varname),veloc_tot)
+    call hdf5_write_data(file_handle,trim(varname),veloc_tot, gzip=16)
     VarName      = trim(MassWeightedGroup)//'/OverDensity'
-    call hdf5_write_data(file_handle,trim(varname),rho_tot/rhocb)
+    call hdf5_write_data(file_handle,trim(varname),rho_tot/rhocb, gzip=16)
     VarName      = trim(MassWeightedGroup)//'/Temperature_K'
-    call hdf5_write_data(file_handle,trim(varname),temp_tot)
+    call hdf5_write_data(file_handle,trim(varname),temp_tot, gzip=16)
     !
     ! Metallicity is a mass fraction
     VarName      = trim(MassWeightedGroup)//'/MetalMassFraction'
-    call hdf5_write_data(file_handle,trim(varname),met_tot)
+    call hdf5_write_data(file_handle,trim(varname),met_tot, gzip=16)
   endif
   !
   do ion=1, nion
     VarName = trim(GroupName)//'/'//trim(ions(ion))//'/Flux'
-    call hdf5_write_data(file_handle, trim(VarName), flux_ion(ion,1:nveloc))
+    call hdf5_write_data(file_handle, trim(VarName), flux_ion(ion,1:nveloc), gzip=16)
     !
     !if(generate_noise)then
     !  VarName = trim(GroupName)//'/'//trim(ions(ion))//'/Gaussian_deviate'
@@ -2404,7 +2435,7 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
     !endif
     !
     VarName = trim(GroupName)//'/'//trim(ions(ion))//'/OpticalDepth'
-    call hdf5_write_data(file_handle, trim(VarName), tau_ion(ion,1:nveloc))
+    call hdf5_write_data(file_handle, trim(VarName), tau_ion(ion,1:nveloc), gzip=16)
     VarName = trim(GroupName)//'/'//trim(ions(ion))//'/LogTotalIonColumnDensity'
     call hdf5_write_data(file_handle, trim(VarName), log10(cdens_ion_integrated(ion)))
   enddo
@@ -2518,7 +2549,7 @@ subroutine allocate_spectra_long()
   allocate(lambda(nvpix),voverc(nvpix))
   allocate(tau_long(nion,nvpix))
   allocate(tau_long_strongest(nion,nvpix))
-  allocate(temp_ion_long(nion,nvpix),n_ion_long(nion,nvpix))
+  allocate(temp_ion_long(nion,nvpix),n_ion_long(nion,nvpix),rho_ion_long(nion,nvpix))
   allocate(temp_z_ion_long(nion,nvpix),rho_z_ion_long(nion,nvpix))
   allocate(rho_long(nvpix),temp_long(nvpix),met_long(nvpix))
   allocate(flux(nvpix), flux_convolved(2*nvpix))
@@ -2526,6 +2557,7 @@ subroutine allocate_spectra_long()
   tau_long(:,:)             = 0.0
   tau_long_strongest(:,:)   = 0.0
   temp_ion_long(:,:)        = 0.0
+  rho_ion_long(:,:)         = 0.0
   n_ion_long(:,:)           = 0.0
   temp_z_ion_long(:,:)      = 0.0
   rho_z_ion_long(:,:)       = 0.0
@@ -2673,10 +2705,10 @@ subroutine write_long_spectrum()
      !
      if (output_frequency) then
         ! write wavelengths
-        call hdf5_write_data(file_handle, '/Frequency_MHz', LightSpeed / binned_lambda / 1e-8 / 1e6)
+        call hdf5_write_data(file_handle, '/Frequency_MHz', LightSpeed / binned_lambda / 1e-8 / 1e6, gzip=16)
      else
         ! write wavelengths
-        call hdf5_write_data(file_handle, '/Wavelength_Ang', binned_lambda)
+        call hdf5_write_data(file_handle, '/Wavelength_Ang', binned_lambda, gzip=16)
      endif
      !
   endif
@@ -2686,13 +2718,13 @@ subroutine write_long_spectrum()
   call hdf5_create_group(file_handle, ThisSpectrum)
   !
   VarName = trim(ThisSpectrum)//'/Flux'
-  call hdf5_write_data(file_handle, trim(VarName), binned_flux)
+  call hdf5_write_data(file_handle, trim(VarName), binned_flux, gzip=16)
   !
   if(generate_noise)then
      VarName = trim(ThisSpectrum)//'/Gaussian_deviate'
-     call hdf5_write_data(file_handle, trim(VarName), binned_noise_random)
+     call hdf5_write_data(file_handle, trim(VarName), binned_noise_random, gzip=16)
      VarName = trim(ThisSpectrum)//'/Noise_Sigma'
-     call hdf5_write_data(file_handle, trim(VarName), binned_noise_sigma)
+     call hdf5_write_data(file_handle, trim(VarName), binned_noise_sigma, gzip=16)
      write(*,*) 'done writing noise info in the output'
   endif
   !
@@ -2705,13 +2737,13 @@ subroutine write_long_spectrum()
       do ion=1,nion
           ElementGroup = trim(ThisSpectrum)//'/'//trim(ions(ion))
           VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthWeightedOverDensity'
-          call hdf5_write_data(file_handle, trim(VarName),binned_rho_z_ion(ion,:))
+          call hdf5_write_data(file_handle, trim(VarName),binned_rho_z_ion(ion,:), gzip=16)
           VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthWeightedTemperature_K'
-          call hdf5_write_data(file_handle, trim(VarName),binned_temp_z_ion(ion,:))
+          call hdf5_write_data(file_handle, trim(VarName),binned_temp_z_ion(ion,:), gzip=16)
           VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthOfStrongestTransition'
-          call hdf5_write_data(file_handle, trim(VarName),binned_tau_ion_strongest(ion,:))
+          call hdf5_write_data(file_handle, trim(VarName),binned_tau_ion_strongest(ion,:), gzip=16)
           VarName = trim(ElementGroup)//'/'//'LogTotalIonColumnDensity'
-          call hdf5_write_data(file_handle, trim(VarName),cdens_ion_integrated(ion))
+          call hdf5_write_data(file_handle, trim(VarName),cdens_ion_integrated(ion), gzip=16)
       enddo
   endif
   !
@@ -2772,7 +2804,7 @@ subroutine rebin_spectrum
      !
      allocate(binned_lambda(n_binned_flux), binned_flux(n_binned_flux))
      allocate(binned_temp_z_ion(nion,n_binned_flux),binned_rho_z_ion(nion,n_binned_flux))
-     allocate(binned_temp_ion(nion,n_binned_flux),binned_n_ion(nion,n_binned_flux))
+     allocate(binned_temp_ion(nion,n_binned_flux),binned_n_ion(nion,n_binned_flux),binned_rho_ion(nion,n_binned_flux))
      allocate(binned_tau_ion(nion,n_binned_flux))
      allocate(binned_tau_ion_strongest(nion,n_binned_flux))
      if(generate_noise) then
@@ -2795,9 +2827,11 @@ subroutine rebin_spectrum
   enddo
   !
   binned_temp_ion = 0.0
+  binned_rho_ion  = 0.0
   binned_n_ion    = 0.0
   do ion=1,nion
      call rebin(temp_ion_long(ion,:),binned_temp_ion(ion,:))
+     call rebin(rho_ion_long(ion,:),binned_rho_ion(ion,:))
      call rebin(n_ion_long(ion,:),binned_n_ion(ion,:))
   enddo
   !
@@ -3790,7 +3824,7 @@ subroutine readdata_owls(filename,los_number)
     Mass_h_exp, Mass_aexp_exp,  Temp_h_exp, Temp_aexp_exp
   real(kind=doubleR)       :: Mass_cgs_unit, Dens_cgs_unit, Eint_cgs_unit, Temp_cgs_unit, Pos_cgs_unit, &
     Vel_cgs_unit
-  real(kind=doubleR)       :: proton_mass
+  !real(kind=doubleR)       :: proton_mass
   real(kind=singleR)       :: z_solar
   real(kind=doubleR)       :: Coordinates_conv, Velocity_conv, Density_conv, Mass_conv, Eint_conv, Temp_conv
   real(kind=doubleR)       :: tmin, tmax, dmin, dmax, metal_max, rnorm2propermpc
@@ -4226,7 +4260,7 @@ subroutine read_full_snapshot()
   real(kind=doubleR)       :: Mass_cgs_unit, Dens_cgs_unit, Eint_cgs_unit, Temp_cgs_unit, &
        Pos_cgs_unit, Vel_cgs_unit
   real(kind=singleR)       :: z_solar, Bsize
-  real(kind=doubleR)       :: proton_mass
+  !real(kind=doubleR)       :: proton_mass
   real(kind=doubleR)       :: Coordinates_conv, Velocity_conv, Density_conv, Mass_conv, Eint_conv, Temp_conv
   real(kind=doubleR)       :: tmin, tmax, dmin, dmax, metal_max, rnorm2propermpc
   integer(kind=singleI)    :: i
@@ -4651,6 +4685,10 @@ subroutine read_full_snapshot()
   Temp_conv          = Temp_aexp_exp * log10(ExpansionFactor) + Temp_h_exp * log10(HubbleParam) + log10(Temp_cgs_unit) ! cgs
   Temp_Conv          = 10.d0**Temp_Conv
   ParticleTemperature        = ParticleTemperature * Temp_Conv 
+  !
+  if(setmaxt4sfgas) then
+    where(StarFormationRate .gt. 0) ParticleTemperature = 1.d4
+  endif
   !
   if(ignore_starforming) then
     where(StarFormationRate .gt. 0) Mass = 0.d0 ! Particles on the EOS do not contribute
@@ -5107,6 +5145,14 @@ subroutine initialize_ionization_tables
      nion = nion + 1
      requireC = .true.
   endif
+  if (doC5) then 
+     nion = nion + 1
+     requireC = .true.
+  endif
+  if (doC6) then 
+     nion = nion + 1
+     requireC = .true.
+  endif
   if (doN2) then 
      nion = nion + 1
      requireN = .true.
@@ -5120,6 +5166,14 @@ subroutine initialize_ionization_tables
      requireN = .true.
   endif
   if (doN5) then 
+     nion = nion + 1
+     requireN = .true.
+  endif
+  if (doN6) then 
+     nion = nion + 1
+     requireN = .true.
+  endif
+  if (doN7) then 
      nion = nion + 1
      requireN = .true.
   endif
@@ -5159,6 +5213,10 @@ subroutine initialize_ionization_tables
      nion = nion + 1
      requireNe = .true.
   endif
+  if (doNe9) then 
+     nion = nion + 1
+     requireNe = .true.
+  endif
   if (doAl2) then 
      nion = nion + 1
      requireAl = .true.
@@ -5188,6 +5246,18 @@ subroutine initialize_ionization_tables
      requireFe = .true.
   endif
   if (doFe3) then 
+     nion = nion + 1
+     requireFe = .true.
+  endif
+  if (doFe17) then 
+     nion = nion + 1
+     requireFe = .true.
+  endif
+  if (doFe19) then 
+     nion = nion + 1
+     requireFe = .true.
+  endif
+  if (doFe21) then 
      nion = nion + 1
      requireFe = .true.
   endif
@@ -5352,6 +5422,28 @@ subroutine initialize_ionization_tables
       fosc(ii,i) = f_C4(i)
     enddo
   endif
+  if (doC5) then
+    ii = ii + 1
+    ions(ii) = 'c5  '
+    ion_mass(ii) = massC
+    ion_elnr(ii) = C_index
+    nlines(ii) = 2
+    do i = 1, nlines(ii)
+      lambda_rest(ii,i) = Lambda_C5(i)
+      fosc(ii,i) = f_C5(i)
+    enddo
+  endif
+  if (doC6) then
+    ii = ii + 1
+    ions(ii) = 'c6  '
+    ion_mass(ii) = massC
+    ion_elnr(ii) = C_index
+    nlines(ii) = 4
+    do i = 1, nlines(ii)
+      lambda_rest(ii,i) = Lambda_C6(i)
+      fosc(ii,i) = f_C6(i)
+    enddo
+  endif
   if (doN2) then
     ii = ii + 1
     ions(ii) = 'n2  '
@@ -5394,6 +5486,28 @@ subroutine initialize_ionization_tables
     do i = 1, nlines(ii)
       lambda_rest(ii,i) = Lambda_N5(i)
       fosc(ii,i) = f_N5(i)
+    enddo
+  endif
+  if (doN6) then
+    ii = ii + 1
+    ions(ii) = 'n6  '
+    ion_mass(ii) = massN
+    ion_elnr(ii) = N_index
+    nlines(ii) = 1
+    do i = 1, nlines(ii)
+      lambda_rest(ii,i) = Lambda_N6(i)
+      fosc(ii,i) = f_N6(i)
+    enddo
+  endif
+  if (doN7) then
+    ii = ii + 1
+    ions(ii) = 'n7  '
+    ion_mass(ii) = massN
+    ion_elnr(ii) = N_index
+    nlines(ii) = 2
+    do i = 1, nlines(ii)
+      lambda_rest(ii,i) = Lambda_N7(i)
+      fosc(ii,i) = f_N7(i)
     enddo
   endif
   if (doO1) then
@@ -5456,7 +5570,7 @@ subroutine initialize_ionization_tables
     ions(ii) = 'o7  '
     ion_mass(ii) = massO
     ion_elnr(ii) = O_index
-    nlines(ii) = 1
+    nlines(ii) = 2
     do i = 1, nlines(ii)
       lambda_rest(ii,i) = Lambda_O7(i)
       fosc(ii,i) = f_O7(i)
@@ -5467,7 +5581,7 @@ subroutine initialize_ionization_tables
     ions(ii) = 'o8  '
     ion_mass(ii) = massO
     ion_elnr(ii) = O_index
-    nlines(ii) = 2
+    nlines(ii) = 4
     do i = 1, nlines(ii)
       lambda_rest(ii,i) = Lambda_O8(i)
       fosc(ii,i) = f_O8(i)
@@ -5561,6 +5675,17 @@ subroutine initialize_ionization_tables
       fosc(ii,i) = f_Ne8(i)
     enddo
   endif
+  if (doNe9) then
+    ii = ii + 1
+    ions(ii) = 'ne9 '
+    ion_mass(ii) = massNe
+    ion_elnr(ii) = Ne_index
+    nlines(ii) = 1
+    do i = 1, nlines(ii)
+      lambda_rest(ii,i) = Lambda_Ne9(i)
+      fosc(ii,i) = f_Ne9(i)
+    enddo
+  endif
   if (doFe2) then
     ii = ii + 1
     ions(ii) = 'fe2 '
@@ -5581,6 +5706,39 @@ subroutine initialize_ionization_tables
     do i = 1, nlines(ii)
       lambda_rest(ii,i) = Lambda_Fe3(i)
       fosc(ii,i) = f_Fe3(i)
+    enddo
+  endif
+  if (doFe17) then
+    ii = ii + 1
+    ions(ii) = 'fe17'
+    ion_mass(ii) = massFe
+    ion_elnr(ii) = Fe_index
+    nlines(ii) = 2
+    do i = 1, nlines(ii)
+      lambda_rest(ii,i) = Lambda_Fe17(i)
+      fosc(ii,i) = f_Fe17(i)
+    enddo
+  endif
+  if (doFe19) then
+    ii = ii + 1
+    ions(ii) = 'fe19'
+    ion_mass(ii) = massFe
+    ion_elnr(ii) = Fe_index
+    nlines(ii) = 2
+    do i = 1, nlines(ii)
+      lambda_rest(ii,i) = Lambda_Fe19(i)
+      fosc(ii,i) = f_Fe19(i)
+    enddo
+  endif
+  if (doFe21) then
+    ii = ii + 1
+    ions(ii) = 'fe21'
+    ion_mass(ii) = massFe
+    ion_elnr(ii) = Fe_index
+    nlines(ii) = 1
+    do i = 1, nlines(ii)
+      lambda_rest(ii,i) = Lambda_Fe21(i)
+      fosc(ii,i) = f_Fe21(i)
     enddo
   endif
   !

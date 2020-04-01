@@ -72,6 +72,7 @@ module atomic_data
   !    Oscillator strength source: Morton 2003, ApJS, 149, 205 (Most UV lines)
   !                                Verner et al 1994, AAPS, 108, 287
   !                                Verner et al 1996, Atomic Data Nucl. Data Tables, 64, 1 (O8 doublet)
+  !                                List from Jelle Kaastra (current SPEX on 2018-02-06), X-ray lines
   !
   !    Multiplet transitions should be in order of decreasing osc strength!
   !
@@ -127,6 +128,12 @@ module atomic_data
   real(kind=doubleR) :: Lambda_C4(2), f_C4(2)
   data Lambda_C4 / 1548.2041, 1550.7812 /      
   data f_C4 / 0.189900, 0.094750 /
+  real(kind=doubleR) :: Lambda_C5(2), f_C5(2)
+  data Lambda_C5 / 40.2678, 34.9728 /      
+  data f_C5 / 0.648, 0.141 /
+  real(kind=doubleR) :: Lambda_C6(4), f_C6(4)
+  data Lambda_C6 / 33.7342, 33.7396, 28.4652, 28.4663 /      
+  data f_C6 / 0.277, 0.139, 0.0527, 0.0263 /
   !
   ! N  
   real(kind=doubleR), parameter :: massN  = 14.0067 * atom_munit
@@ -142,6 +149,12 @@ module atomic_data
   real(kind=doubleR) :: Lambda_N5(2), f_N5(2)
   data Lambda_N5 / 1238.821, 1242.804 /      
   data f_N5 / 0.156000, 0.0770 /
+  real(kind=doubleR) :: Lambda_N6(1), f_N6(1)
+  data Lambda_N6 / 28.7875 /      
+  data f_N6 / 0.675 /
+  real(kind=doubleR) :: Lambda_N7(2), f_N7(2)
+  data Lambda_N7 / 24.7792, 24.7846 /      
+  data f_N7 / 0.277, 0.139 /
   !
   ! O  
   real(kind=doubleR), parameter :: massO  = 15.9994 * atom_munit
@@ -160,18 +173,21 @@ module atomic_data
   real(kind=doubleR) :: Lambda_O6(2), f_O6(2)
   data Lambda_O6 / 1031.9261, 1037.6167 /      
   data f_O6 / 0.13250, 0.06580 /
-  real(kind=doubleR) :: Lambda_O7(1), f_O7(1)
-  data Lambda_O7 / 21.60169 /      
-  data f_O7 / 0.696 /
-  real(kind=doubleR) :: Lambda_O8(2), f_O8(2)
-  data Lambda_O8 / 18.9671, 18.9725 /      
-  data f_O8 / 0.277, 0.139/
+  real(kind=doubleR) :: Lambda_O7(2), f_O7(2)
+  data Lambda_O7 / 21.6019, 18.6284 /      
+  data f_O7 / 0.696, 0.146 /
+  real(kind=doubleR) :: Lambda_O8(4), f_O8(4)
+  data Lambda_O8 / 18.9671, 18.9725, 16.0055, 16.0067/      
+  data f_O8 / 0.277, 0.139, 0.0527, 0.0263/
   !
   ! Ne
   real(kind=doubleR), parameter :: massNe = 20.1797 * atom_munit
   real(kind=doubleR) :: Lambda_Ne8(2), f_Ne8(2)
   data Lambda_Ne8 / 770.409, 780.324 /
   data f_Ne8 / 0.103, 0.0505 /
+  real(kind=doubleR) :: Lambda_Ne9(1), f_Ne9(1)
+  data Lambda_Ne9 / 13.4471 /
+  data f_Ne9 / 0.724 /
   !
   ! Mg
   real(kind=doubleR), parameter :: massMg = 24.3050 * atom_munit
@@ -218,6 +234,15 @@ module atomic_data
   real(kind=doubleR) ::  Lambda_Fe3(1), f_Fe3(1)
   data Lambda_Fe3 / 1122.52 /      
   data f_Fe3 / 0.0544257 /
+  real(kind=doubleR) ::  Lambda_Fe17(2), f_Fe17(2)
+  data Lambda_Fe17 / 15.0140, 15.2610 /      
+  data f_Fe17 / 2.72, 0.614 /
+  real(kind=doubleR) ::  Lambda_Fe19(2), f_Fe19(2)
+  data Lambda_Fe19 / 13.5180, 13.5146 /      
+  data f_Fe19 / 0.717, 0.0199 /
+  real(kind=doubleR) ::  Lambda_Fe21(1), f_Fe21(1)
+  data Lambda_Fe21 / 12.2840 /      
+  data f_Fe21 / 1.24 /
   !
 end module atomic_data
 
@@ -376,15 +401,15 @@ module spectra
   logical :: doall = .false.
   logical :: doH1= .true., &
     doHe2=.false., &
-    doC2=.false., doC3=.false., doC4=.false., &
-    doN2= .false., doN3=.false., doN4=.false., doN5=.false., &
+    doC2=.false., doC3=.false., doC4=.false., doC5=.false., doC6=.false., &
+    doN2= .false., doN3=.false., doN4=.false., doN5=.false., doN6=.false., doN7=.false., &
     doO1=.false., doO3=.false., doO4=.false., doO5=.false., doO6=.false., doO7 = .false., doO8 = .false., &
-    doNe8=.false., &
+    doNe8=.false., doNe9=.false., &
     doMg2=.false., &
     doAl2=.false., doAl3=.false., &
     doSi2=.false., doSi3=.false., doSi4 = .false., &
     doS5=.false., &
-    doFe2=.false., doFe3=.false., &
+    doFe2=.false., doFe3=.false., doFe17=.false., doFe19=.false., doFe21=.false., &
     do21cm=.false.
   !
   ! number of lines to be included in Lyman-series, <= nlyman_all=31
@@ -464,7 +489,7 @@ module spectra
   ! real(kind=doubleR), allocatable    :: temp_z_long(:), rho_z_long(:)
   !
   ! real-space quantities
-  real(kind=doubleR), allocatable    :: temp_ion_long(:,:), n_ion_long(:,:) ! size nvpix
+  real(kind=doubleR), allocatable    :: temp_ion_long(:,:), n_ion_long(:,:), rho_ion_long(:,:) ! size nvpix
   real(kind=doubleR), allocatable    :: temp_long(:), rho_long(:), met_long(:)
   !
   real(kind=doubleR), allocatable    :: flux_convolved(:)  ! size 2*nvpix 
@@ -475,7 +500,7 @@ module spectra
   real(kind=doubleR), allocatable    :: binned_lambda(:), binned_flux(:)! size n_binned_spectrum
   real(kind=doubleR), allocatable    :: binned_noise_sigma(:) , binned_noise_random(:)
   real(kind=doubleR), allocatable    :: binned_temp_z_ion(:,:), binned_rho_z_ion(:,:)
-  real(kind=doubleR), allocatable    :: binned_temp_ion(:,:),binned_n_ion(:,:)
+  real(kind=doubleR), allocatable    :: binned_temp_ion(:,:),binned_n_ion(:,:),binned_rho_ion(:,:)
   real(kind=doubleR), allocatable    :: binned_tau_ion(:,:), binned_tau_ion_strongest(:,:)
   integer(kind=singleI), allocatable :: binned_spectrum_boundary(:)
   !
@@ -491,7 +516,7 @@ module spectra
   real(kind=doubleR), allocatable  :: rho_tot(:),temp_tot(:),met_tot(:),veloc_tot(:)
   !
   ! real-space quantities weigthed by number of ions
-  real(kind=doubleR), allocatable  :: n_ion(:,:), temp_ion(:,:), veloc_ion(:,:), od_ion(:,:)
+  real(kind=doubleR), allocatable  :: n_ion(:,:), temp_ion(:,:), veloc_ion(:,:), od_ion(:,:), rho_ion(:,:)
   !
   ! redshift-space quantities weigthed by number of ions
   real(kind=doubleR), allocatable  :: rho_z_ion(:,:), temp_z_ion(:,:), tau_ion(:,:), &
@@ -587,7 +612,7 @@ module particledata
   implicit none
   !
   ! header values
-  real(kind=doubleR)    :: rhocb, BoxPhys
+  real(kind=doubleR)    :: rhocb, BoxPhys, proton_mass
   real(kind=doubleR)    :: Boxkms
   !
   integer(kind=singleI) :: NGas
