@@ -1,6 +1,11 @@
 ## parameter files and line of sight lists
 */los/*
 */parameterfiles/*
+# excpetions: examples and run scripts
+!los/los_sample3_first16.txt
+!parameterfiles/L0100N1504-sample3-first16_test.par
+!parameterfiles/execscript
+!parameterfiles/execscript_mpi
 
 # backups
 *~
