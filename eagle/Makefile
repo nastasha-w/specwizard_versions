@@ -7,8 +7,8 @@
 #
 
 CC      = gcc
-#CFLAGS  = -g -DH5_USE_16_API
-CFLAGS  = -DH5_USE_16_API
+CFLAGS  = -g -DH5_USE_16_API
+#CFLAGS  = -DH5_USE_16_API
 
 #FC      = ifort
 FC      = mpiifort
