@@ -4,7 +4,7 @@
 % Files and directories
 % ------------------------------------------------------
 %Directory containing ionization files:
-ibdir           = ../IonizationTables/HM01G+C/
+ibdir           = ../../Ali_Spec_src/IonizationTables/HM01G+C/
 
 %Directory containing LOS files:
 datadir         = /cosma7/data/Eagle/ScienceRuns/Planck1/L0100N1504/PE/REFERENCE/data/snapshot_027_z000p101/
