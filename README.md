@@ -10,7 +10,9 @@ finding the right hdf5 version is an issue, addressed in the makefiles here and 
 modules:
 --------
   module load intel_comp/2018-update2
+  
   module load intel_mpi/2018
+  
   module load hdf5/1.8.20
 
 
