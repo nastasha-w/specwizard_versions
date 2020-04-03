@@ -6,6 +6,9 @@
 !los/los_sample3_first16.txt
 !parameterfiles/L0100N1504-sample3-first16.par
 
+# backups (linux)
+*~
+
 ## github c default, include /mod and .o that Fortran90 gets
 # Prerequisites
 *.d
