@@ -2743,7 +2743,7 @@ subroutine write_long_spectrum()
           VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthOfStrongestTransition'
           call hdf5_write_data(file_handle, trim(VarName),binned_tau_ion_strongest(ion,:), gzip=16)
           VarName = trim(ElementGroup)//'/'//'LogTotalIonColumnDensity'
-          call hdf5_write_data(file_handle, trim(VarName),cdens_ion_integrated(ion), gzip=16)
+          call hdf5_write_data(file_handle, trim(VarName),cdens_ion_integrated(ion))
       enddo
   endif
   !

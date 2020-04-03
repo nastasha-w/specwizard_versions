@@ -624,14 +624,21 @@ module particledata
   !
 #ifdef EAGLE
   real(kind=doubleR), allocatable :: Position(:,:)
-#else
-  real(kind=singleR), allocatable :: Position(:,:)
-#endif
-  real(kind=singleR), allocatable :: Velocity(:,:)!!!, ShiftedPosition(:,:), ShiftedVelocity(:,:)
-  real(kind=singleR), allocatable:: Mass(:),ParticleDensity(:),&
-    ParticleSmoothingLength(:),ParticleTemperature(:),Metallicity(:), MassFractions(:,:),  &
+  real(kind=doubleR), allocatable :: Velocity(:,:)!!!, ShiftedPosition(:,:), ShiftedVelocity(:,:)
+  real(kind=doubleR), allocatable:: Mass(:),ParticleDensity(:),&
+    ParticleSmoothingLength(:),ParticleTemperature(:), Metallicity(:), & 
+    MassFractions(:,:),  &
     MetallicityInSolar(:), Zmetal(:), Zrelat(:), StarFormationRate(:),&
     ParticleNeutralHFraction(:),ParticleMolecularHFraction(:)
+#else
+  real(kind=singleR), allocatable :: Position(:,:)
+  real(kind=singleR), allocatable :: Velocity(:,:)!!!, ShiftedPosition(:,:), ShiftedVelocity(:,:)
+  real(kind=singleR), allocatable:: Mass(:),ParticleDensity(:),&
+    ParticleSmoothingLength(:),ParticleTemperature(:),Metallicity(:), &
+    MassFractions(:,:),  &
+    MetallicityInSolar(:), Zmetal(:), Zrelat(:), StarFormationRate(:),&
+    ParticleNeutralHFraction(:),ParticleMolecularHFraction(:)
+#endif
   integer(kind=singleI), allocatable ::  Boundary(:)
   integer(kind=singleI), allocatable :: itype(:)
   !

@@ -107,7 +107,7 @@ program specwizard
   !
   ! create output file and write attributes
   if(do_long_spectrum) &
-       call create_spectrum_file()
+       call create_spectrum_file(1)
   !
 #ifdef MPI
     call mpi_barrier(mpi_comm_world, ierr)
