@@ -74,6 +74,8 @@ parameter they are shown on the right hand side of the page, the
 subscript ${\odot}$ represents solar values.  If any parameters remain
 uninitialized then SpecWizard will crash on startup.  \linebreak
 
+Note that this default-name parameter file is not present in this repository.
+
 \section{Basic Runtime Control}
 
 \paramdefinition{do\_long\_spectrum}{logical}{}
@@ -216,8 +218,11 @@ uninitialized then SpecWizard will crash on startup.  \linebreak
 \paramdefinition{minbother\_red}{real}{}
 \paramdescription{Accuracy parameter, minimum optical depth to consider for transitions with rest-frame wavelength longer than that of H{\sc i} Ly$\alpha$.  The smaller this number the more accurate the results, but the slower the code will run.}
 
+\paramdefinition{limsigma}{logical}{}
+\paramdescription{Accuracy parameter. If true, the line profile is only calculated over the velocity range where the optical depth is above {\tt minbother} divided by the number of pixels. This means that, at most, a total amount of absorption {\tt minbother} is missed in each pixel.}
+
 \paramdefinition{vpixsizekms}{real}{km/s}
-\paramdescription{Pixel size in km/s.  For short spectra this represents the final output pixel size.  for long spectra this represents the pixel size before rebinning into. SpecWizard will stop if this is too small compared with the other parameters. The smaller this number the more accurate the results, but the slower the code will run.}
+\paramdescription{Pixel size in km/s.  For short spectra this represents the final output pixel size.  for long spectra this represents the pixel size before rebinning into. SpecWizard will stop if this is too small compared with the other parameters. The smaller this number the more accurate the results, but the slower the code will run. Note that this also sets the resolution at which the position-space ion densities and ion-weighted temperatures and peculiar velocities are calculated. The shape and width of the spectral features can therefore be affected if these values are too low.}
 
 \section{Parameters For Long Spectrum}
 \paramdefinition{zqso}{real}{}
@@ -364,6 +369,23 @@ The mass corresponding to square pixel is then
 &=&{\cal N}^2\,\left[{1\over 2}\,({\rm erf}((x_2-x_0)/(2\sigma^2)^{1/2})-{1\over 2}{\rm erf}((x_1-x_0)/(2\sigma^2)^{1/2})\right]\times\left[x\rightarrow y\right]\,,
 \end{eqnarray}
 and the corresponding mean column density is $\bar{\cal C}={\cal I}/(a\,dx)^2$, again multiplying by the scale factor $a$ to obtain a physical column density.
+
+\chapter{How specwizard works}
+Here, we give an outline of the algorithms used by specwizard to calculate the spectra.
+
+\section{Short spectra}
+When calculating short spectra, the SPH particle data is first interpolated to a 1-dimensional grid along the line of site. This is then used to calculated the optical depth as a function of line of sight velocity. In these calculations, positions are periodic with the box size, as in the simulations being post-processed. Similarly, line-of-sight velocities are taken to be periodic, with a period equal to the Hubble flow across the box.
+
+\paragraph{{\tt subroutine projectdata}}
+Looping over the SPH particles, the ion content is calculated for each. The ionization balance is calculated from the density, temperature, and redshift, by interpolating the ionization tables. The total ion content then follows from the ionization fraction, mass, and element abundance. To calculate the ion density in each cell along the line of sight in position space, the chosen kernel is used, scaled with the smoothing length of the particle. Depending on the integration option, the kernel is either evaluated at the cell centre or integrated over the line of sight between cell edges (second option only available for a Gaussian kernel). Besides the ion densities themselves, the velocity along the line of sight and the temperature are needed for each cell. The ion-weighted temperatures and velocities are used for this. The number of cells in position space is equal to the number of pixels in velocity space.
+
+\paragraph{{\tt subroutine makespectra}, {\tt subroutine computespectrum}}
+From the ion densities, velocties, and temperatures in the cells, along with the cell sizes and atomic data, the optical depth as a function of line of sight velocity is calculated. 
+Looping over cell with position $x$ along the line of sight, each cell is treated as a single absorbing cloud. 
+Each cell's absorption is modelled as a single Gaussian line. (Damping wings are ignored, but can be added in further post-processing). The total (integrated) optical depth is set by the column density in the cell, and the width by thermal broadening. (Additional turbulent broadening should be possible, but is not recently tested.) It's centre is set at $x H(z) + v_p$, where $v_p$ is the ion-weighted peculiar velocity in the cell. The Gaussian is either integrated over the cell or evaluated at the cell centre ({\tt integrate\_thermprof\_exactly}).
+ 
+
+ 
 
 
 \end{document}

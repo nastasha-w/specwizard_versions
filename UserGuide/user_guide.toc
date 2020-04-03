@@ -1,0 +1,18 @@
+\contentsline {chapter}{\numberline {1}How to Run SpecWizard}{3}% 
+\contentsline {chapter}{\numberline {2}Parameters}{4}% 
+\contentsline {section}{\numberline {2.1}Basic Runtime Control}{4}% 
+\contentsline {section}{\numberline {2.2}Files and Directories}{4}% 
+\contentsline {section}{\numberline {2.3}Output Control}{6}% 
+\contentsline {section}{\numberline {2.4}Control of Ions}{7}% 
+\contentsline {section}{\numberline {2.5}Metal Abundance Modification}{7}% 
+\contentsline {section}{\numberline {2.6}Noise Statistics}{9}% 
+\contentsline {section}{\numberline {2.7}Accuracy Parameters}{10}% 
+\contentsline {section}{\numberline {2.8}Parameters For Long Spectrum}{10}% 
+\contentsline {chapter}{\numberline {3}Structure of Output Files}{12}% 
+\contentsline {section}{\numberline {3.1}Short Spectra}{12}% 
+\contentsline {section}{\numberline {3.2}Long Spectra}{13}% 
+\contentsline {section}{\numberline {3.3}Normalised Gaussians}{14}% 
+\contentsline {chapter}{\numberline {4}How specwizard works}{16}% 
+\contentsline {section}{\numberline {4.1}Short spectra}{16}% 
+\contentsline {paragraph}{{\tt subroutine projectdata}}{16}% 
+\contentsline {paragraph}{{\tt subroutine makespectra}, {\tt subroutine computespectrum}}{16}% 
