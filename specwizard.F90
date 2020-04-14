@@ -188,10 +188,14 @@ program specwizard
           endif
           !
           ! project SPH data to sightline
+          call cpu_timer_start(doprojecteach)
           call projectdata()
+          call cpu_timer_stop(doprojecteach)
           !
           ! Compute individual spectrum for each ion
+          call cpu_timer_start(domakespectraeach)
           call makespectra()
+          call cpu_timer_stop(domakespectraeach)
           !
           ! insert in resulting spectrum
           call cpu_timer_start(doinsert)
@@ -367,11 +371,15 @@ program specwizard
         endif
         !
         ! project SPH data to sightline
+        call cpu_timer_start(doprojecteach)
         call projectdata()
+        call cpu_timer_stop(doprojecteach)
         ncontribute(los_number+1) = ncontr
         !
         ! compute individual spectrum for each ion
+        call cpu_timer_start(domakespectraeach)
         call makespectra()
+        call cpu_timer_stop(domakespectraeach)
         !
         ! convolve with instrumental profile
         if (do_convolve_spectrum) call convolve_short_spectrum()
@@ -384,9 +392,13 @@ program specwizard
 #endif  
         !          
 !!$        if(verbose .or. MyPE == 0) &
-        if (MyPE == 0) &
+        if (MyPE == 0) then
              write (*,'('' MyPE = '',I2,'' file is '',i2,'' out of '',i3,'' sightline = '',i5,'' out of '',i6,'' rhocb= '',e12.4)') & 
              MyPE, ifile, nlosfiles, los_number+1, numspec, rhocb
+             if(verbose) &
+                write (*,'('' projectdata time = '',e12.4,'' makespectra time = '',e12.4)') & 
+                cputime(doprojecteach), cputime(domakespectraeach)
+        endif
         !
         ! Output Spectra
         do iproc=0, numpes-1

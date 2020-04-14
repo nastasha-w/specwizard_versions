@@ -24,7 +24,8 @@ module cpu_timers
   implicit none
   !
   integer,parameter  :: ntimers = 20
-  integer, parameter :: main=1, dospectra=2, doinsert=3, dointerpolate=4
+  integer, parameter :: main=1, dospectra=2, doinsert=3, dointerpolate=4, &
+                        doprojecteach=5, domakespectraeach=6
   real(kind=doubleR) :: cputime(ntimers), cpustart(ntimers), cpustop(ntimers)
   logical            :: cpu_is_running(ntimers)
   !
