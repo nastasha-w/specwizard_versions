@@ -201,6 +201,11 @@ program specwizard
           call cpu_timer_start(doinsert)
           call insertspectra(zcurrent_next)
           call cpu_timer_stop(doinsert)
+          ! report single-snapshot spectrum timing
+          if(verbose) &
+                write (*,'('' projectdata time = '',e12.4,'' s, makespectra time = '',e12.4,&
+                           '' s, insertspectra time = '',e12.4,'' s'')') & 
+                cputime(doprojecteach), cputime(domakespectraeach), cputime(doinsert)
           !
           call store_spectrum_info(simfile(ifile), los_number)
           !
@@ -229,6 +234,10 @@ program specwizard
         if(generate_noise) call add_noise()
         !
         call cpu_timer_stop(dospectra)
+        ! report time for long spectrum
+        if(verbose) &
+                write (*,'('' long spectrum time = '',e12.4,'' s'')') & 
+                cputime(dospectra)
         !
       endif good_spectrum
       !
@@ -396,7 +405,7 @@ program specwizard
              write (*,'('' MyPE = '',I2,'' file is '',i2,'' out of '',i3,'' sightline = '',i5,'' out of '',i6,'' rhocb= '',e12.4)') & 
              MyPE, ifile, nlosfiles, los_number+1, numspec, rhocb
              if(verbose) &
-                write (*,'('' projectdata time = '',e12.4,'' makespectra time = '',e12.4)') & 
+                write (*,'('' projectdata time = '',e12.4,'' s, makespectra time = '',e12.4,'' s'')') & 
                 cputime(doprojecteach), cputime(domakespectraeach)
         endif
         !
