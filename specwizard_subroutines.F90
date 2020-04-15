@@ -3683,6 +3683,8 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/PixSizekms_Before_convolution', vpixsizekms)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/nLyman', nLyman)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/ibfactor',ibfactor)
+  call hdf5_write_attribute(file_handle, trim(GroupName)//'/minbother_red',minbother_red)
+  call hdf5_write_attribute(file_handle, trim(GroupName)//'/minbother_blue',minbother_blue)
   if(use_fitted_ibfactor) then
      call hdf5_write_attribute(file_handle, trim(GroupName)//'/use_fitted_ibfactor', 'TRUE')
   else
