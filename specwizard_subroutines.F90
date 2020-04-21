@@ -2674,7 +2674,7 @@ subroutine insertspectra(zcurrent_next)
         maxvoc = min(voc(nveloc) ,log(1.+zqso))+ logl        
         !
         ! redshift-space ion-weighted density, temperature and velocity
-        if output_zspaceopticaldepthweighted_values .and. (j .eq. 1)) then
+        if (output_zspaceopticaldepthweighted_values .and. (j .eq. 1)) then
            call spline_interpolate(&
                 nveloc,vocsim,rho_z_ion(ion,:) &
                 ,minvoc,maxvoc,ion,small_rho &
@@ -2737,7 +2737,9 @@ subroutine write_long_spectrum()
   implicit none
   ! local variables
   integer               :: file_handle, ion, infile_handle
-  character(len=120)    :: outfile, GroupName, ThisSpectrum, VarName, ElementGroup,inputfile
+  character(len=120)    :: outfile, GroupName, ThisSpectrum, VarName, ElementGroup, &
+                           inputfile, IonWeightedGroup, MassWeightedGroup, &
+                           RedshiftIonWeightedGroup
   !
   call hdf5_open_file(file_handle,trim(SpectrumFile))
   !
