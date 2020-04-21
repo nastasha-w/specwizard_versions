@@ -2854,11 +2854,11 @@ subroutine write_long_spectrum()
   VarName = trim(GroupName)//'/Ibfactor'
   call hdf5_write_data(file_handle,trim(VarName), ibfactor_used(1:nsimfile_used), gzip=16)
   VarName = trim(GroupName)//'/x-axis'
-  call hdf5_write_attribute(file_handle,trim(VarName), x_axis_used(1:nsimfile_used), gzip=16)
+  call hdf5_write_data(file_handle,trim(VarName), x_axis_used(1:nsimfile_used), gzip=16)
   VarName = trim(GroupName)//'/y-axis'
-  call hdf5_write_attribute(file_handle,trim(VarName), y_axis_used(1:nsimfile_used), gzip=16)
+  call hdf5_write_data(file_handle,trim(VarName), y_axis_used(1:nsimfile_used), gzip=16)
   VarName = trim(GroupName)//'/z-axis'
-  call hdf5_write_attribute(file_handle,trim(VarName), z_axis_used(1:nsimfile_used), gzip=16)
+  call hdf5_write_data(file_handle,trim(VarName), z_axis_used(1:nsimfile_used), gzip=16)
   !endif
   !
   call hdf5_close_file(file_handle)
