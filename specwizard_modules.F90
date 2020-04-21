@@ -371,7 +371,8 @@ module runtime
   logical  :: do_convolve_spectrum = .true.           ! if true, convolve final spectrum with instrumental profile of 'fwhm' km/s
   real(kind=doubleR), parameter :: &                  ! small values
     small_rho = 1.d-30, small_temp=0.1, &             ! small values
-    small_metallicity = 1.d-10, small_column  = 1     ! small values
+    small_metallicity = 1.d-10, small_column  = 1, &  ! small values
+    small_velocity = 1.d-10                           ! small values
   !
 end module runtime
 
@@ -476,6 +477,7 @@ module spectra
   integer(kind=singleI)              :: nsimfile_used
   integer(kind=singleI), parameter   :: max_nsimfile_used = 1000
   integer(kind=singleI), allocatable :: los_used(:)
+  integer(kind=singleI), allocatable :: x_axis_used(:), y_axis_used(:), z_axis_used(:)
   character(len=120), allocatable    :: losfile_used(:)
   real(kind=doubleR), allocatable    :: x_physical_used(:), y_physical_used(:), ibfactor_used(:), icshift_used(:)
   !
@@ -486,12 +488,14 @@ module spectra
   real(kind=doubleR), allocatable    :: cdens_ion_integrated(:)
   !
   ! redshift-space quantities
-  real(kind=doubleR), allocatable    :: temp_z_ion_long(:,:), rho_z_ion_long(:,:) ! size nvpix
+  real(kind=doubleR), allocatable    :: temp_z_ion_long(:,:), rho_z_ion_long(:,:), &
+                                        veloc_z_ion_long(:,:) ! size nvpix
   ! real(kind=doubleR), allocatable    :: temp_z_long(:), rho_z_long(:)
   !
   ! real-space quantities
-  real(kind=doubleR), allocatable    :: temp_ion_long(:,:), n_ion_long(:,:), rho_ion_long(:,:) ! size nvpix
-  real(kind=doubleR), allocatable    :: temp_long(:), rho_long(:), met_long(:)
+  real(kind=doubleR), allocatable    :: temp_ion_long(:,:), n_ion_long(:,:),&
+                                        rho_ion_long(:,:),  veloc_ion_long(:,:) ! size nvpix
+  real(kind=doubleR), allocatable    :: temp_long(:), rho_long(:), met_long(:), veloc_long(:)
   !
   real(kind=doubleR), allocatable    :: flux_convolved(:)  ! size 2*nvpix 
   complex(kind=doubleR), allocatable :: fft(:)
@@ -500,8 +504,11 @@ module spectra
   integer(kind=singleI) :: n_binned_flux
   real(kind=doubleR), allocatable    :: binned_lambda(:), binned_flux(:)! size n_binned_spectrum
   real(kind=doubleR), allocatable    :: binned_noise_sigma(:) , binned_noise_random(:)
-  real(kind=doubleR), allocatable    :: binned_temp_z_ion(:,:), binned_rho_z_ion(:,:)
-  real(kind=doubleR), allocatable    :: binned_temp_ion(:,:),binned_n_ion(:,:),binned_rho_ion(:,:)
+  real(kind=doubleR), allocatable    :: binned_temp_z_ion(:,:), binned_rho_z_ion(:,:),&
+                                        binned_veloc_z_ion(:,:) 
+  real(kind=doubleR), allocatable    :: binned_temp_ion(:,:),binned_n_ion(:,:),&
+                                        binned_rho_ion(:,:), binned_veloc_ion(:,:)
+  real(kind=doubleR), allocatable    :: binned_temp(:), binned_rho(:), binned_met(:), binned_veloc(:)
   real(kind=doubleR), allocatable    :: binned_tau_ion(:,:), binned_tau_ion_strongest(:,:)
   integer(kind=singleI), allocatable :: binned_spectrum_boundary(:)
   !

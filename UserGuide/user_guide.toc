@@ -16,3 +16,4 @@
 \contentsline {section}{\numberline {4.1}Short spectra}{16}% 
 \contentsline {paragraph}{{\tt subroutine projectdata}}{16}% 
 \contentsline {paragraph}{{\tt subroutine makespectra}, {\tt subroutine computespectrum}}{16}% 
+\contentsline {section}{\numberline {4.2}Long spectra}{17}% 

@@ -29,6 +29,8 @@
 \item #1
 \end{itemize}\vspace{0.2cm}}
 
+\newcommand{\param}[1]{{\tt #1}}
+
 %------------------------------- The Document
 \begin{document}
 \begin{center}
@@ -382,10 +384,22 @@ Looping over the SPH particles, the ion content is calculated for each. The ioni
 \paragraph{{\tt subroutine makespectra}, {\tt subroutine computespectrum}}
 From the ion densities, velocties, and temperatures in the cells, along with the cell sizes and atomic data, the optical depth as a function of line of sight velocity is calculated. 
 Looping over cell with position $x$ along the line of sight, each cell is treated as a single absorbing cloud. 
-Each cell's absorption is modelled as a single Gaussian line. (Damping wings are ignored, but can be added in further post-processing). The total (integrated) optical depth is set by the column density in the cell, and the width by thermal broadening. (Additional turbulent broadening should be possible, but is not recently tested.) It's centre is set at $x H(z) + v_p$, where $v_p$ is the ion-weighted peculiar velocity in the cell. The Gaussian is either integrated over the cell or evaluated at the cell centre ({\tt integrate\_thermprof\_exactly}).
+Each cell's absorption is modelled as a single Gaussian line. (Damping wings are ignored, but can be added in further post-processing). The total (integrated) optical depth is set by the column density in the cell, and the width by thermal broadening. (Additional turbulent broadening should be possible, but is not recently tested.) It's centre is set at $x H(z) + v_p$, where $v_p$ is the ion-weighted peculiar velocity in the cell. The Gaussian is either integrated over the cell or evaluated at the cell centre (\param{ntegrate\_thermprof\_exactly}).
  
 
- 
+\section{Long spectra}
+To make long spectra, line-of-sight (los) files are needed in the current implementation. These are simulation outputs at smaller time intervals than the Eagle snapshots, containing all particles intersecting a set of 100 lines of sight through the box at each output time. These lines of sight are along the $X$ or $Z$ axis of the simulation, and the axes and positions are randomly chosen. Specwizard chooses lines of sight randomly from all files within some redshift difference $\Delta \, z$ of the end redshift of the last segment \param{zcurrent}, set by the \param{fzresol} parameter.
 
+The lines of sight (files, los numbers, positions, and axes) used are stored in the specwizard output. The positions are in the same units as coordinates in the simulation; for Eagle, that's $\mathrm{cMpc} \, \mathrm{h}^{-1}$.
+
+The short spectra are calculated in the same way as in short spectrum mode, except that the densities are rescaled by the expansion factor at the redshift of the sightline segment (\param{acurrent}/\param{zcurrent}), rather than that of the line-of-sight file or snapshot. The same is true for cosmological calculations, such as local Hubble factors.
+
+These short spectra are then interpolated onto a wavelength grid. The \param{output\_frequency} options allows frequency outputs, but the calculations are still done in wavelength space; the output file simply contains the fixed-$\Delta$-$\lambda$-grid spectra, but the spectrum bin array is converted to frequency units (MHz). The resolution at which the spectra are calculated is set by the pixel size chosen in velocity space.
+
+The spectra are finally binned to that fixed-$\Delta$-$\lambda$-grid, simply averaging the values that contributes to the same final pixel. This may cause small discrepancies between flux and optical depth spectra. For weighted average spectra, the binning respects the weighting. (The weighted quantities are multiplied by the weights before binning, then divided by the binned weights.)
+
+Weighted line of sight properties are a function of line of sight position for the real space quantities, and wavelength for the redshift space quantities. Optical-depth-weighted averages account for contributions by the strongest (first listed) transition for each ion only.
+
+\param{spline\_interpolate} adds interpolated values to values already in the output array. Great for optical depths of different lines, but requires caution for averaged quantities.  
 
 \end{document}

@@ -1157,7 +1157,8 @@ subroutine initialize_spectral_parameters
     ! allocate space for info about simulation files used
     allocate(los_used(max_nsimfile_used), icshift_used(max_nsimfile_used), &
       x_physical_used(max_nsimfile_used), y_physical_used(max_nsimfile_used), ibfactor_used(max_nsimfile_used), &
-      losfile_used(max_nsimfile_used))
+      losfile_used(max_nsimfile_used), x_axis_used(max_nsimfile_used), &
+      y_axis_used(max_nsimfile_used), z_axis_used(max_nsimfile_used))
   else
     !
     if(verbose .and. MyPE == 0) then
@@ -1396,6 +1397,7 @@ subroutine zero_spectra()
   temp_long            = 0.d0
   rho_long             = 0.d0
   met_long             = 0.d0
+  veloc_long           = 0.d0
   cdens_ion_integrated = 0.d0
   !
 end subroutine zero_spectra
@@ -2551,9 +2553,11 @@ subroutine allocate_spectra_long()
   allocate(lambda(nvpix),voverc(nvpix))
   allocate(tau_long(nion,nvpix))
   allocate(tau_long_strongest(nion,nvpix))
-  allocate(temp_ion_long(nion,nvpix),n_ion_long(nion,nvpix),rho_ion_long(nion,nvpix))
-  allocate(temp_z_ion_long(nion,nvpix),rho_z_ion_long(nion,nvpix))
-  allocate(rho_long(nvpix),temp_long(nvpix),met_long(nvpix))
+  allocate(temp_ion_long(nion,nvpix),n_ion_long(nion,nvpix),rho_ion_long(nion,nvpix), &
+           veloc_ion_long(nion, nvpix))
+  allocate(temp_z_ion_long(nion,nvpix), rho_z_ion_long(nion,nvpix), &
+           veloc_z_ion_long(nion,nvpix))
+  allocate(rho_long(nvpix),temp_long(nvpix),met_long(nvpix),veloc_long(nvpix))
   allocate(flux(nvpix), flux_convolved(2*nvpix))
   !
   tau_long(:,:)             = 0.0
@@ -2561,8 +2565,10 @@ subroutine allocate_spectra_long()
   temp_ion_long(:,:)        = 0.0
   rho_ion_long(:,:)         = 0.0
   n_ion_long(:,:)           = 0.0
+  veloc_ion_long(:,:)       = 0.0
   temp_z_ion_long(:,:)      = 0.0
   rho_z_ion_long(:,:)       = 0.0
+  veloc_z_ion_long(:,:)     = 0.0
   cdens_ion_integrated(:)   = 0.0
   flux(:)                   = 0.0
   flux_convolved(:)         = 0.0
@@ -2631,8 +2637,33 @@ subroutine insertspectra(zcurrent_next)
           nveloc,vocsim,met_tot &
           ,minvoc,maxvoc,1,small_metallicity &
           ,nvpix,voverc,met_long,is_positive=.true.)
+     call spline_interpolate(&
+          nveloc,vocsim,veloc_tot &
+          ,minvoc,maxvoc,1,small_velocity &
+          ,nvpix,voverc,veloc_long,is_positive=.false.)
   endif
-
+  !
+  if (output_realspacenionweighted_values) then
+     do ion = 1, nion
+        call spline_interpolate(&
+             nveloc,vocsim,n_ion(ion,:) &
+             ,minvoc,maxvoc,1,small_rho &
+             ,nvpix,voverc,n_ion_long(ion,:),is_positive=.true.)
+        
+        call spline_interpolate(&
+             nveloc,vocsim,temp_ion(ion,:) &
+             ,minvoc,maxvoc,1,small_temp &
+             ,nvpix,voverc,temp_ion_long(ion,:),is_positive=.true.)
+        call spline_interpolate(&
+             nveloc,vocsim,rho_ion(ion,:) &
+             ,minvoc,maxvoc,1,small_metallicity &
+             ,nvpix,voverc,rho_ion_long(ion,:),is_positive=.true.)
+        call spline_interpolate(&
+             nveloc,vocsim,veloc_ion(ion,:) &
+             ,minvoc,maxvoc,1,small_velocity &
+             ,nvpix,voverc,veloc_ion_long(ion,:),is_positive=.false.)
+    enddo
+  endif
   !
   ion_loop: do ion = 1, nion
      taumax(ion) = maxval(tau_ion(ion,:))
@@ -2640,7 +2671,23 @@ subroutine insertspectra(zcurrent_next)
      lines: do j = 1, nlines(ion)
         logl   = log(lambda_rest(ion,j)/minlambda)
         minvoc = min(voc(1)      ,log(1.+zqso))+ logl
-        maxvoc = min(voc(nveloc) ,log(1.+zqso))+ logl
+        maxvoc = min(voc(nveloc) ,log(1.+zqso))+ logl        
+        !
+        ! redshift-space ion-weighted density, temperature and velocity
+        if output_zspaceopticaldepthweighted_values .and. (j .eq. 1)) then
+           call spline_interpolate(&
+                nveloc,vocsim,rho_z_ion(ion,:) &
+                ,minvoc,maxvoc,ion,small_rho &
+                ,nvpix,voverc,rho_z_ion_long(ion,:),is_positive=.true.)
+           call spline_interpolate(&
+                nveloc,vocsim,temp_z_ion(ion,:)&
+                ,minvoc,maxvoc,ion,small_temp&
+                ,nvpix,voverc,temp_z_ion_long(ion,:),is_positive=.true.)
+           call spline_interpolate(&
+                nveloc,vocsim,veloc_z_ion(ion,:)&
+                ,minvoc,maxvoc,ion,small_velocity&
+                ,nvpix,voverc,veloc_z_ion_long(ion,:),is_positive=.false.)
+        endif 
         if (minvoc .le. voverc(nvpix) .and.  maxvoc .ge. voverc(1)) then 
            if (lambda_rest(ion,j) .gt. 1.001 * lyalpha) then
               minbother = minbother_red
@@ -2669,15 +2716,6 @@ subroutine insertspectra(zcurrent_next)
                   ,loginterpolate=.true.,is_positive=.true.)
               endif
 
-              ! redshift-space ion-weighted density, temperature and column density
-              call spline_interpolate(&
-                   nveloc,vocsim,rho_z_ion(ion,:) &
-                   ,minvoc,maxvoc,ion,minbother &
-                   ,nvpix,voverc,rho_z_ion_long(ion,:),is_positive=.true.)
-              call spline_interpolate(&
-                   nveloc,vocsim,temp_z_ion(ion,:)&
-                   ,minvoc,maxvoc,ion,minbother&
-                   ,nvpix,voverc,temp_z_ion_long(ion,:),is_positive=.true.)
            endif tau_limit
         endif
      enddo lines
@@ -2735,18 +2773,59 @@ subroutine write_long_spectrum()
   call hdf5_write_attribute(file_handle,VarName,Seed)
   !
   ! properties of each ion
+  do ion=1,nion
+     ElementGroup = trim(ThisSpectrum)//'/'//trim(ions(ion))
+     call hdf5_create_group(file_handle, ElementGroup)
+     VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthOfStrongestTransition'
+     call hdf5_write_data(file_handle, trim(VarName),binned_tau_ion_strongest(ion,:), gzip=16)
+     VarName = trim(ElementGroup)//'/'//'LogTotalIonColumnDensity'
+     call hdf5_write_data(file_handle, trim(VarName),cdens_ion_integrated(ion))
+  enddo
+  !
   if (output_zspaceopticaldepthweighted_values) then
+     do ion=1,nion
+          ElementGroup = trim(ThisSpectrum)//'/'//trim(ions(ion))
+          RedshiftIonWeightedGroup = trim(ElementGroup)//'/RedshiftSpaceOpticalDepthWeighted'
+          call hdf5_create_group(file_handle, RedshiftIonWeightedGroup)
+          VarName = trim(RedshiftIonWeightedGroup)//'/'//'OverDensity'
+          call hdf5_write_data(file_handle, trim(VarName),binned_rho_z_ion(ion,:), gzip=16)
+          VarName = trim(RedshiftIonWeightedGroup)//'/'//'Temperature_K'
+          call hdf5_write_data(file_handle, trim(VarName),binned_temp_z_ion(ion,:), gzip=16)
+          VarName = trim(RedshiftIonWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
+          call hdf5_write_data(file_handle, trim(VarName),binned_veloc_z_ion(ion,:), gzip=16)
+      enddo
+  endif
+  !
+  if (output_realspacenionweighted_values) then
       do ion=1,nion
           ElementGroup = trim(ThisSpectrum)//'/'//trim(ions(ion))
-          VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthWeightedOverDensity'
-          call hdf5_write_data(file_handle, trim(VarName),binned_rho_z_ion(ion,:), gzip=16)
-          VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthWeightedTemperature_K'
-          call hdf5_write_data(file_handle, trim(VarName),binned_temp_z_ion(ion,:), gzip=16)
-          VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthOfStrongestTransition'
-          call hdf5_write_data(file_handle, trim(VarName),binned_tau_ion_strongest(ion,:), gzip=16)
-          VarName = trim(ElementGroup)//'/'//'LogTotalIonColumnDensity'
-          call hdf5_write_data(file_handle, trim(VarName),cdens_ion_integrated(ion))
+          IonWeightedGroup = trim(ElementGroup)//'/RealSpaceNionWeighted'
+          call hdf5_create_group(file_handle, IonWeightedGroup)
+          VarName = trim(ElementGroup)//'/'//'NIon_CM3'
+          call hdf5_write_data(file_handle, trim(VarName),binned_n_ion(ion,:), gzip=16)
+          VarName = trim(IonWeightedGroup)//'/'//'OverDensity'
+          call hdf5_write_data(file_handle, trim(VarName),binned_rho_ion(ion,:), gzip=16)
+          VarName = trim(IonWeightedGroup)//'/'//'Temperature_K'
+          call hdf5_write_data(file_handle, trim(VarName),binned_temp_ion(ion,:), gzip=16)
+          VarName = trim(IonWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
+          call hdf5_write_data(file_handle, trim(VarName),binned_veloc_ion(ion,:), gzip=16)
       enddo
+  endif
+  ! Mass-weighted properties along the los
+  if (output_realspacemassweighted_values) then
+      MassWeightedGroup = trim(ThisSpectrum)//'/RealSpaceMassWeighted'
+      call hdf5_create_group(file_handle, MassWeightedGroup)
+      VarName      = trim(MassWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
+      call hdf5_write_data(file_handle,trim(varname),binned_veloc, gzip=16)
+      VarName      = trim(MassWeightedGroup)//'/OverDensity'
+      call hdf5_write_data(file_handle,trim(varname),binned_rho/rhocb, gzip=16)
+      VarName      = trim(MassWeightedGroup)//'/Temperature_K'
+      call hdf5_write_data(file_handle,trim(varname),binned_temp, gzip=16)
+      !
+      ! Metallicity is a mass fraction
+      VarName      = trim(MassWeightedGroup)//'/MetalMassFraction'
+      call hdf5_write_data(file_handle,trim(varname),binned_met, gzip=16)
+      !marker
   endif
   !
   ! output info of small spectra used
@@ -2757,20 +2836,28 @@ subroutine write_long_spectrum()
   VarName = trim(GroupName)//'/NumberOfShortSpectra'
   call hdf5_write_data(file_handle, trim(VarName), nsimfile_used)
   !
-  if (gimic) then
-     VarName = trim(GroupName)//'/FileUsed'
-     call hdf5_write_data(file_handle,trim(VarName), losfile_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/LosUsed'
-     call hdf5_write_data(file_handle,trim(VarName), los_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/Icshift'
-     call hdf5_write_data(file_handle,trim(VarName), icshift_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/x_physical'
-     call hdf5_write_data(file_handle,trim(VarName), x_physical_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/y_physical'
-     call hdf5_write_data(file_handle,trim(VarName), y_physical_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/Ibfactor'
-     call hdf5_write_data(file_handle,trim(VarName), ibfactor_used(1:nsimfile_used))
+  !if (gimic) then ! record this for all input files
+  if (.not. use_snapshot_file) then
+      VarName = trim(GroupName)//'/FileUsed'
+      call hdf5_write_data(file_handle,trim(VarName), losfile_used(1:nsimfile_used), gzip=16)
+      VarName = trim(GroupName)//'/LosUsed'
+      call hdf5_write_data(file_handle,trim(VarName), los_used(1:nsimfile_used), gzip=16)
   endif
+  VarName = trim(GroupName)//'/Icshift'
+  call hdf5_write_data(file_handle,trim(VarName), icshift_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/x_simunits'
+  call hdf5_write_data(file_handle,trim(VarName), x_physical_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/y_simunits'
+  call hdf5_write_data(file_handle,trim(VarName), y_physical_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/Ibfactor'
+  call hdf5_write_data(file_handle,trim(VarName), ibfactor_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/x-axis'
+  call hdf5_write_attribute(file_handle,trim(VarName), x_axis_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/y-axis'
+  call hdf5_write_attribute(file_handle,trim(VarName), y_axis_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/z-axis'
+  call hdf5_write_attribute(file_handle,trim(VarName), z_axis_used(1:nsimfile_used), gzip=16)
+  !endif
   !
   call hdf5_close_file(file_handle)
   !
@@ -2805,8 +2892,12 @@ subroutine rebin_spectrum
      n_binned_old = n_binned_flux
      !
      allocate(binned_lambda(n_binned_flux), binned_flux(n_binned_flux))
-     allocate(binned_temp_z_ion(nion,n_binned_flux),binned_rho_z_ion(nion,n_binned_flux))
-     allocate(binned_temp_ion(nion,n_binned_flux),binned_n_ion(nion,n_binned_flux),binned_rho_ion(nion,n_binned_flux))
+     allocate(binned_temp(n_binned_flux), binned_rho(n_binned_flux), &
+              binned_met(n_binned_flux), binned_veloc(n_binned_flux))
+     allocate(binned_temp_z_ion(nion,n_binned_flux),binned_rho_z_ion(nion,n_binned_flux), &
+              binned_veloc_z_ion(nion,n_binned_flux))
+     allocate(binned_temp_ion(nion,n_binned_flux),binned_n_ion(nion,n_binned_flux), &
+              binned_rho_ion(nion,n_binned_flux),binned_veloc_ion(nion,n_binned_flux))
      allocate(binned_tau_ion(nion,n_binned_flux))
      allocate(binned_tau_ion_strongest(nion,n_binned_flux))
      if(generate_noise) then
@@ -2821,21 +2912,52 @@ subroutine rebin_spectrum
   binned_flux(:)  = 0.d0
   call rebin(flux_convolved,binned_flux)
   !
-  binned_temp_z_ion = 0.0
-  binned_rho_z_ion  = 0.0
-  do ion=1,nion
-     call rebin(temp_z_ion_long(ion,:),binned_temp_z_ion(ion,:))
-     call rebin(rho_z_ion_long(ion,:),binned_rho_z_ion(ion,:))
-  enddo
+  if (output_realspacemassweighted_values) then
+     temp_long = temp_long * rho_long
+     met_long = met_long * rho_long
+     veloc_long = veloc_long * rho_long
+     call rebin(rho_long,binned_rho)
+     call rebin(temp_long,binned_temp)
+     call rebin(met_long,binned_met)
+     call rebin(veloc_long,binned_veloc)
+     binned_temp = binned_temp / binned_rho
+     binned_met = binned_met / binned_rho
+     binned_veloc = binned_veloc / binned_rho
+  endif
   !
-  binned_temp_ion = 0.0
-  binned_rho_ion  = 0.0
-  binned_n_ion    = 0.0
-  do ion=1,nion
-     call rebin(temp_ion_long(ion,:),binned_temp_ion(ion,:))
-     call rebin(rho_ion_long(ion,:),binned_rho_ion(ion,:))
-     call rebin(n_ion_long(ion,:),binned_n_ion(ion,:))
-  enddo
+  if (output_zspaceopticaldepthweighted_values) then
+      binned_temp_z_ion  = 0.0
+      binned_rho_z_ion   = 0.0
+      binned_veloc_z_ion = 0.0
+      ! maintain the weighting in the rebinning process
+      temp_z_ion_long(:,:) = temp_z_ion_long(:,:) * tau_long_strongest(:,:)
+      rho_z_ion_long(:,:) = rho_z_ion_long(:,:) * tau_long_strongest(:,:)
+      veloc_z_ion_long(:,:) = veloc_z_ion_long(:,:) * tau_long_strongest(:,:)
+      do ion=1,nion
+         call rebin(temp_z_ion_long(ion,:),binned_temp_z_ion(ion,:))
+         call rebin(rho_z_ion_long(ion,:),binned_rho_z_ion(ion,:))    
+         call rebin(veloc_z_ion_long(ion,:),binned_veloc_z_ion(ion,:))
+      enddo
+  endif
+  !
+  if (output_realspacenionweighted_values) then
+     binned_temp_ion  = 0.0
+     binned_rho_ion   = 0.0
+     binned_veloc_ion = 0.0
+     binned_n_ion     = 0.0
+     temp_ion_long(:,:) = temp_ion_long(:,:) * n_ion_long(:,:)
+     rho_ion_long(:,:) = rho_ion_long(:,:) * n_ion_long(:,:)
+     veloc_ion_long(:,:) = veloc_ion_long(:,:) * n_ion_long(:,:)
+     do ion=1,nion
+        call rebin(temp_ion_long(ion,:),binned_temp_ion(ion,:))
+        call rebin(rho_ion_long(ion,:),binned_rho_ion(ion,:))
+        call rebin(veloc_ion_long(ion,:),binned_veloc_ion(ion,:))
+        call rebin(n_ion_long(ion,:),binned_n_ion(ion,:))
+     enddo
+     binned_temp_ion(:,:) = binned_temp_ion(:,:) / binned_n_ion(:,:)
+     binned_rho_ion(:,:) = binned_rho_ion(:,:) / binned_n_ion(:,:)
+     binned_veloc_ion(:,:) = binned_veloc_ion(:,:) / binned_n_ion(:,:)
+  endif
   !
   binned_tau_ion = 0.0
   binned_tau_ion_strongest = 0.0
@@ -2843,6 +2965,13 @@ subroutine rebin_spectrum
      call rebin(tau_long(ion,:),binned_tau_ion(ion,:))
      call rebin(tau_long_strongest(ion,:),binned_tau_ion_strongest(ion,:))
   enddo
+  !
+  ! finish weighted averaging for z-space n_ion-weighted spectra
+  if (output_zspaceopticaldepthweighted_values) then
+     binned_temp_z_ion(:,:) = binned_temp_z_ion(:,:) / binned_tau_ion_strongest(:,:)
+     binned_rho_z_ion(:,:) = binned_rho_z_ion(:,:) / binned_tau_ion_strongest(:,:)
+     binned_veloc_z_ion(:,:) = binned_veloc_z_ion(:,:) / binned_tau_ion_strongest(:,:)
+  endif
   !
 end subroutine rebin_spectrum
 
@@ -2909,7 +3038,7 @@ end subroutine convolve_long_spectrum
 subroutine store_spectrum_info(simfile_used, los_number_used)
   use numbers
   use spectra
-  use projection_parameters, only : x_comoving, y_comoving
+  use projection_parameters, only : x_comoving, y_comoving, x_axis, y_axis, z_axis
   implicit none
   character(*), intent(in)          :: simfile_used
   integer(kind=singleI), intent(in) :: los_number_used
@@ -2924,6 +3053,9 @@ subroutine store_spectrum_info(simfile_used, los_number_used)
      !
      x_physical_used(nsimfile_used)    = x_comoving
      y_physical_used(nsimfile_used)    = y_comoving
+     x_axis_used(nsimfile_used)        = x_axis
+     y_axis_used(nsimfile_used)        = y_axis
+     z_axis_used(nsimfile_used)        = z_axis
      ibfactor_used(nsimfile_used) = ibfactor
   endif
 end subroutine store_spectrum_info
@@ -3624,6 +3756,7 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_rho',small_rho)
   call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_temp',small_temp)
   call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_metallicity',small_metallicity)
+  call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_velocity',small_velocity)
   call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_column',small_column )
   !
   if(modify_metallicity)then
@@ -3683,8 +3816,8 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/PixSizekms_Before_convolution', vpixsizekms)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/nLyman', nLyman)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/ibfactor',ibfactor)
-  call hdf5_write_attribute(file_handle, trim(GroupName)//'/minbother_red',minbother_red)
-  call hdf5_write_attribute(file_handle, trim(GroupName)//'/minbother_blue',minbother_blue)
+  call hdf5_write_attribute(file_handle, trim(GroupName)//'/minbother_red', minbother_red)
+  call hdf5_write_attribute(file_handle, trim(GroupName)//'/minbother_blue', minbother_blue)
   if(use_fitted_ibfactor) then
      call hdf5_write_attribute(file_handle, trim(GroupName)//'/use_fitted_ibfactor', 'TRUE')
   else
@@ -3718,6 +3851,7 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/SmallRho', Small_Rho)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/SmallTemp', Small_Temp)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Small_metallicity',Small_metallicity )
+  call hdf5_write_attribute(file_handle, trim(GroupName)//'/Small_velocity',Small_velocity )
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Small_column', Small_Column)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Datadir', datadir)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Ionization_directory', ibdir)
@@ -3797,7 +3931,8 @@ end subroutine load_noise
 
 subroutine readdata_owls(filename,los_number)
   !
-  ! Read in data of OWLS simulation (hdf5).
+  ! Read in data of OWLS simulation (hdf5): 
+  ! modified -> read EAGLE or OWLS data from LOS files
   !
   use numbers
   use header
