@@ -297,6 +297,7 @@ arrays are
 \item OverDensity
 \item Temperature\_K
 \end{itemize}
+Note that the OverDensity is not the mass-weighted density in each pixel, but the density itself, used as a weight for the other datasets. 
 
 If {\tt output\_zspaceopticaldepthweighted\_values} was set to true
 then there is an additional subgroup called {\tt
@@ -305,13 +306,14 @@ then there is an additional subgroup called {\tt
 \begin{itemize}
 \item OverDensity
 \item Temperature\_K
+\item LOSPeculiarVelocity\_KMpS
 \end{itemize}
 
-These are arrays of densities and temperatures, with particle properties weighted by the optical depth they contribute to each pixel.  If {\tt output\_realspacenionweighted\_values} is set then there is another additional subgroup, called {\tt RealSpaceNionWeighted}, which contains the following arrays:
+These are arrays of densities and temperatures, with particle properties weighted by the optical depth they contribute to each pixel. Note that this is weighted by the optical depth of the strongest transition only. If {\tt output\_realspacenionweighted\_values} is set then there is another additional subgroup, called {\tt RealSpaceNionWeighted}, which contains the following arrays:
 
 \begin{itemize}
 \item LOSPeculiarVelocity\_KMpS
-\item NIon\_CM3
+\item NIon\_CM3 (in the ion group, not {\tt RealSpaceNionWeighted})
 \item OverDensity
 \item Temperature\_K
 \end{itemize}
@@ -320,16 +322,17 @@ These are real space quantities, weighted by Nion.  Warning!  If all optional ou
 
 \section{Long Spectra}
 
-Each spectrum group contains an array, {\tt Flux}, containing the total normalized, transmitted flux as a function of wavelength.  If noise has been specified then two additional arrays are present, called {\tt Gaussian\_deviate} and {\tt Noise\_Sigma}.  An additional group, called {\tt ShortSpectraInfo} contains information so that the exact lines of sight used from the LOS files may be looked up.  Finally, the spectrum group contains a sub-group for each individual ion, if {\tt output\_zspaceopticaldepthweighted\_values} is true then this group contains the following arrays:
+Each spectrum group contains an array, {\tt Flux}, containing the total normalized, transmitted flux as a function of wavelength.  If noise has been specified then two additional arrays are present, called {\tt Gaussian\_deviate} and {\tt Noise\_Sigma}.  An additional group, called {\tt ShortSpectraInfo} contains information so that the exact lines of sight used from the LOS files may be looked up.  Finally, the spectrum group contains a sub-group for each individual ion, if {\tt output\_zspaceopticaldepthweighted\_values} is true then this group contains a subgroup {\tt RedshiftSpaceOpticalDepth}with the following arrays:
 
 \begin{itemize}
-\item RedshiftSpaceOpticalDepthOfStrongestTransition
-\item RedshiftSpaceOpticalDepthWeightedOverDensity
-\item RedshiftSpaceOpticalDepthWeightedTemperature\_K
-\item LogColumnDensity
+\item RedshiftSpaceOpticalDepthOfStrongestTransition (in the ion group, not the optical depth group)
+\item LogColumnDensity (in the ion group, not the optical depth group)
+\item OverDensity
+\item Temperature\_K
+\item LOSPeculiarVelocity\_KMpS
 \end{itemize}
 
-Each of the arrays is of the same size as {\tt /Wavelength\_Ang}, and describes the overdensity and temperature of each pixel, where gas particle properties have been weighted by their contribution to the optical depth.
+Each of the arrays is of the same size as {\tt /Wavelength\_Ang}, and describes the overdensity, temperature, and peculiar velocity of each pixel, where gas particle properties have been weighted by their contribution to the optical depth.
 
 \section{Normalised Gaussians}
 We use error functions instead of the M4 kernel to obtain integrals over bins. To do so we replace the M4 SPH spline with a function which is a produce of 1D Gaussians,

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.10.1)  21 APR 2020 18:48
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.10.1)  22 APR 2020 14:34
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -97,12 +97,12 @@ LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
 Chapter 3.
 [12
 
-] [13]
-Overfull \hbox (89.17622pt too wide) in alignment at lines 369--372
+] [13] [14]
+Overfull \hbox (89.17622pt too wide) in alignment at lines 372--375
  [][][] []
  []
 
-[14] [15]
+[15]
 Chapter 4.
 [16
 
@@ -110,7 +110,7 @@ Chapter 4.
 Here is how much of TeX's memory you used:
  466 strings out of 492616
  5626 string characters out of 6129481
- 68915 words of memory out of 5000000
+ 67915 words of memory out of 5000000
  4438 multiletter control sequences out of 15000+600000
  14582 words of font info for 38 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -129,7 +129,7 @@ b></usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb
 /usr/local/texlive/2019/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/loc
 al/texlive/2019/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/local/texl
 ive/2019/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb>
-Output written on user_guide.pdf (18 pages, 178964 bytes).
+Output written on user_guide.pdf (18 pages, 179219 bytes).
 PDF statistics:
  115 PDF objects out of 1000 (max. 8388607)
  81 compressed objects within 1 object stream
