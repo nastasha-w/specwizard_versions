@@ -17,7 +17,7 @@ snap_base       =  snap_027_z000p101 % keep same as last directory above (part b
 % this file must be present inside datadir or SpecWizard will crash
 % the file_list file can also be used to consider only a subset of the
 % available data.
-file_list       =  /cosma7/data/Eagle/ScienceRuns/Planck1/L0100N1504/PE/REFERENCE/data/los/files_z1p5z5 % vestigial from OWLS
+file_list       =  ../los/files_z1p5z5 % vestigial from OWLS
 %Directory to write output files:
 outputdir       = /cosma5/data/dp004/dc-wije1/specwiz/longspec_test2/
 
