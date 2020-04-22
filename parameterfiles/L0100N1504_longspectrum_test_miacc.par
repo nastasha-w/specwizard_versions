@@ -14,12 +14,12 @@ datadir         = /cosma7/data/Eagle/ScienceRuns/Planck1/L0100N1504/PE/REFERENCE
 snap_base       =  snap_027_z000p101 % keep same as last directory above (part before .#.hdf5 in file names)
 
 % ASCII file contianing list of valid LOS files in directory datadir
-% this file must be present inside datadir or SpecWizard will crash
+% this file must be present inside datadir or SpecWizard will crash -> not true, another path works fine.
 % the file_list file can also be used to consider only a subset of the
 % available data.
 file_list       =  ../los/files_z1p5z5 % vestigial from OWLS
 %Directory to write output files:
-outputdir       = /cosma5/data/dp004/dc-wije1/specwiz/longspec_test2/
+outputdir       = /cosma5/data/dp004/dc-wije1/specwiz/longspec_test3/
 
 %If true then write frequencies to output files, rather than wavelengths:
 output_frequency  = F
