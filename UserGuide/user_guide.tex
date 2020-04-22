@@ -93,7 +93,10 @@ Note that this default-name parameter file is not present in this repository.
 \paramdescription{Location of HDF5 file containing ionization fractions of each species as a function of redshift, density and temperature}
 
 \paramdefinition{datadir}{string}{}
-\paramdescription{Location of the data files.  n.b. This directory must contain (in addition to LOS files) an ascii text file with name specified by the {\tt file\_list} variable.  This file must contain a list of los files that SpecWizard is allowed to use. OR if use\_snapshot\_file is true, this must be the directory containing the snapshot directory.}
+\paramdescription{Location of the data files.  See also \param{file\_list}.
+%n.b. This directory must contain (in addition to LOS files) an ascii text file with name specified by the {\tt file\_list} variable.  
+%This file must contain a list of los files that SpecWizard is allowed to use. 
+OR if use\_snapshot\_file is true, this must be the directory containing the snapshot directory.}
 
 \paramdefinition{use\_snapshot\_file}{logical}{}
 \paramdescription{If this is true then instead of using LOS files, SpecWizard works with snapshot files}
@@ -108,7 +111,7 @@ Note that this default-name parameter file is not present in this repository.
 \paramdescription{An ascii file containing LOS coordinates for SW. The first line simply contains the number of coordinates in the file. The rest of the file has 5 columns: x y z phi theta}
 
 \paramdefinition{file\_list}{string}{}
-\paramdescription{An ascii file called {\tt file\_list} must be present inside of {\tt datadir}.  This file must contain a list of LOS files, with one file per line.  If this file is not present SpecWizard will crash.}
+\paramdescription{An ascii file called {\tt file\_list} must be present inside of {\tt datadir}.  This file must contain a list of LOS files, with one file per line.  If this file is not present SpecWizard will crash. Update: this variable must contain the full path to the file containing the list of LOS files. It can be in \param{datadir} or somewhere else; both work.}
 
 \paramdefinition{outputdir}{string}{}
 \paramdescription{Directory to write output data to}
