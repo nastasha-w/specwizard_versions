@@ -4,7 +4,9 @@
 */parameterfiles/*
 # but leave in examples
 !los/los_sample3_first16.txt
+!los/files_z1p5z5
 !parameterfiles/L0100N1504-sample3-first16.par
+!parameterfiles/L0100N1504_longspectrum_test_miacc.par
 
 # backups (linux)
 *~
