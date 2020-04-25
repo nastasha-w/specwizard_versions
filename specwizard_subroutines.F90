@@ -2952,7 +2952,6 @@ subroutine rebin_spectrum
         binned_redshift_realspace(i)  = zabsmin + dble(i-1)*pixsize/maxlambda
      enddo
   endif
-  endif
   !
   binned_flux(:)  = 0.d0
   call rebin(flux_convolved,binned_flux)
