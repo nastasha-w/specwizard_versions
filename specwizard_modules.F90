@@ -479,10 +479,13 @@ module spectra
   integer(kind=singleI), allocatable :: los_used(:)
   integer(kind=singleI), allocatable :: x_axis_used(:), y_axis_used(:), z_axis_used(:)
   character(len=120), allocatable    :: losfile_used(:)
-  real(kind=doubleR), allocatable    :: x_physical_used(:), y_physical_used(:), ibfactor_used(:), icshift_used(:)
+  real(kind=doubleR), allocatable    :: x_physical_used(:), y_physical_used(:), &
+                                        ibfactor_used(:), icshift_used(:)
   !
   ! spectrum array full spectrum
-  real(kind=doubleR), allocatable    :: lambda(:), voverc(:), tau_long(:,:), flux(:), tau_long_strongest(:,:)   ! size nvpix 
+  real(kind=doubleR), allocatable    :: lambda(:), voverc(:), tau_long(:,:), flux(:), &
+                                        tau_long_strongest(:,:)   ! size nvpix 
+  real(kind=doubleR), allocatable    :: voverc_realspace(:), redshift_realspace(:) ! size nppix 
   !
   ! column density array
   real(kind=doubleR), allocatable    :: cdens_ion_integrated(:)
@@ -501,8 +504,9 @@ module spectra
   complex(kind=doubleR), allocatable :: fft(:)
   !
   ! rebinned spectrum
-  integer(kind=singleI) :: n_binned_flux
+  integer(kind=singleI) :: n_binned_flux, n_binned_realspace
   real(kind=doubleR), allocatable    :: binned_lambda(:), binned_flux(:)! size n_binned_spectrum
+  real(kind=doubleR), allocatable    :: binned_redshift_realspace(:)
   real(kind=doubleR), allocatable    :: binned_noise_sigma(:) , binned_noise_random(:)
   real(kind=doubleR), allocatable    :: binned_temp_z_ion(:,:), binned_rho_z_ion(:,:),&
                                         binned_veloc_z_ion(:,:) 
@@ -515,6 +519,7 @@ module spectra
   ! Computed values
   integer(kind=singleI) :: nvpix
   real(kind=doubleR)    :: vpixsize
+  integer(kind=singleI) :: nppix
   !
   integer(kind=singleI) :: icshift
   !

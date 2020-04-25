@@ -1060,6 +1060,8 @@ subroutine initialize_spectral_parameters
     !     transform, we thus need to increase the array so that it is a
     !     power of 2.
     nvpix   = int(2**(aint(log(dble(nvpix))/log(2.)) + 1))
+    ! number of pixels for the real space weighted arrays (function of z)
+    nppix = log((1.d0 + zabsmin)/(1.d0 + zabsmin))/(1e5*vpixsizekms)*LightSpeed
     !
     call allocate_spectra_long()  ! size nvpix
     !
@@ -1073,7 +1075,15 @@ subroutine initialize_spectral_parameters
     do i=1, nvpix
       voverc(i) = dble(i-1) * vpixsize
     enddo
+    !
     lambda = minlambda * exp(voverc) 
+    !
+    if (output_realspacenionweighted_values .or. output_realspacemassweighted_values) then
+      do i=1, nppix
+        voverc_realspace(i) = dble(i-1) * vpixsize
+      enddo
+      redshift_realspace = exp(voverc_realspace) - 1.d0
+    endif
     !
     !     -------------------
     !     Read in noise file.
@@ -2554,11 +2564,11 @@ subroutine allocate_spectra_long()
   allocate(lambda(nvpix),voverc(nvpix))
   allocate(tau_long(nion,nvpix))
   allocate(tau_long_strongest(nion,nvpix))
-  allocate(temp_ion_long(nion,nvpix),n_ion_long(nion,nvpix),rho_ion_long(nion,nvpix), &
-           veloc_ion_long(nion, nvpix))
+  allocate(temp_ion_long(nion,nppix),n_ion_long(nion,nppix),rho_ion_long(nion,nppix), &
+           veloc_ion_long(nion, nppix))
   allocate(temp_z_ion_long(nion,nvpix), rho_z_ion_long(nion,nvpix), &
            veloc_z_ion_long(nion,nvpix))
-  allocate(rho_long(nvpix),temp_long(nvpix),met_long(nvpix),veloc_long(nvpix))
+  allocate(rho_long(nppix),temp_long(nppix),met_long(nppix),veloc_long(nppix))
   allocate(flux(nvpix), flux_convolved(2*nvpix))
   !
   tau_long(:,:)             = 0.0
@@ -2571,6 +2581,10 @@ subroutine allocate_spectra_long()
   rho_z_ion_long(:,:)       = 0.0
   veloc_z_ion_long(:,:)     = 0.0
   cdens_ion_integrated(:)   = 0.0
+  rho_long(:)               = 0.0
+  temp_long(:)              = 0.0
+  met_long(:)               = 0.0
+  veloc_long(:)             = 0.0        
   flux(:)                   = 0.0
   flux_convolved(:)         = 0.0
   !
@@ -2630,20 +2644,20 @@ subroutine insertspectra(zcurrent_next)
      call spline_interpolate(&
           nveloc,vocsim,rho_tot &
           ,minvoc,maxvoc,1,small_rho &
-          ,nvpix,voverc,rho_long,is_positive=.true.)
+          ,nppix,voverc_realspace,rho_long,is_positive=.true.)
      
      call spline_interpolate(&
           nveloc,vocsim,temp_tot &
           ,minvoc,maxvoc,1,small_temp &
-          ,nvpix,voverc,temp_long,is_positive=.true.)
+          ,nppix,voverc_realspace,temp_long,is_positive=.true.)
      call spline_interpolate(&
           nveloc,vocsim,met_tot &
           ,minvoc,maxvoc,1,small_metallicity &
-          ,nvpix,voverc,met_long,is_positive=.true.)
+          ,nppix,voverc_realspace,met_long,is_positive=.true.)
      call spline_interpolate(&
           nveloc,vocsim,veloc_tot &
           ,minvoc,maxvoc,1,small_velocity &
-          ,nvpix,voverc,veloc_long,is_positive=.false.)
+          ,nppix,voverc_realspace,veloc_long,is_positive=.false.)
   endif
   !
   if (output_realspacenionweighted_values) then
@@ -2651,20 +2665,20 @@ subroutine insertspectra(zcurrent_next)
         call spline_interpolate(&
              nveloc,vocsim,n_ion(ion,:) &
              ,minvoc,maxvoc,1,small_rho &
-             ,nvpix,voverc,n_ion_long(ion,:),is_positive=.true.)
+             ,nppix,voverc_realspace,n_ion_long(ion,:),is_positive=.true.)
         
         call spline_interpolate(&
              nveloc,vocsim,temp_ion(ion,:) &
              ,minvoc,maxvoc,1,small_temp &
-             ,nvpix,voverc,temp_ion_long(ion,:),is_positive=.true.)
+             ,nppix,voverc_realspace,temp_ion_long(ion,:),is_positive=.true.)
         call spline_interpolate(&
              nveloc,vocsim,rho_ion(ion,:) &
              ,minvoc,maxvoc,1,small_metallicity &
-             ,nvpix,voverc,rho_ion_long(ion,:),is_positive=.true.)
+             ,nppix,voverc_realspace,rho_ion_long(ion,:),is_positive=.true.)
         call spline_interpolate(&
              nveloc,vocsim,veloc_ion(ion,:) &
              ,minvoc,maxvoc,1,small_velocity &
-             ,nvpix,voverc,veloc_ion_long(ion,:),is_positive=.false.)
+             ,nppix,voverc_realspace,veloc_ion_long(ion,:),is_positive=.false.)
     enddo
   endif
   !
@@ -2831,7 +2845,11 @@ subroutine write_long_spectrum()
       ! Metallicity is a mass fraction
       VarName      = trim(MassWeightedGroup)//'/MetalMassFraction'
       call hdf5_write_data(file_handle,trim(varname),binned_met, gzip=16)
-      !marker
+  endif
+  !
+  if (output_realspacemassweighted_values .or. output_realspacenionweighted_values) then
+      VarName      = trim(ThisSpectrum)//'/Redshift_RealSpace'
+      call hdf5_write_data(file_handle,trim(varname),binned_redshift_realspace, gzip=16)
   endif
   !
   ! output info of small spectra used
@@ -2882,7 +2900,7 @@ subroutine rebin_spectrum
   ! local variables
   integer :: i,j,k,ninbin,file_handle,ion
   character(len=120) :: filename
-  integer(kind=singleI), save :: n_binned_old=-1
+  integer(kind=singleI), save :: n_binned_old=-1, n_binned_realspace_old=-1
   !
   if (verbose .and. MyPE == 0)  &
        write(*,'("Rebinning onto ",f7.4," A pixels...")') pixsize
@@ -2898,12 +2916,8 @@ subroutine rebin_spectrum
      n_binned_old = n_binned_flux
      !
      allocate(binned_lambda(n_binned_flux), binned_flux(n_binned_flux))
-     allocate(binned_temp(n_binned_flux), binned_rho(n_binned_flux), &
-              binned_met(n_binned_flux), binned_veloc(n_binned_flux))
      allocate(binned_temp_z_ion(nion,n_binned_flux),binned_rho_z_ion(nion,n_binned_flux), &
               binned_veloc_z_ion(nion,n_binned_flux))
-     allocate(binned_temp_ion(nion,n_binned_flux),binned_n_ion(nion,n_binned_flux), &
-              binned_rho_ion(nion,n_binned_flux),binned_veloc_ion(nion,n_binned_flux))
      allocate(binned_tau_ion(nion,n_binned_flux))
      allocate(binned_tau_ion_strongest(nion,n_binned_flux))
      if(generate_noise) then
@@ -2913,6 +2927,31 @@ subroutine rebin_spectrum
      do i=1, n_binned_flux
         binned_lambda(i)     = minlambda + dble(i-1)*pixsize
      enddo
+  endif
+  !
+  if (output_realspacemassweighted_values .or. output_zspaceopticaldepthweighted_values) then
+     n_binned_realspace = int((zabsmax - zabsmin) / pixsize * maxlambda) + 1
+     !
+     if(n_binned_realspace_old /= n_binned_realspace)then
+        if(n_binned_realspace_old .gt. 0) then
+           write (*,*) ' error: change in spectrum size? '
+           stop
+        endif
+        n_binned_realspace_old = n_binned_realspace
+        !
+        allocate(binned_redshift_realspace(n_binned_realspace))
+        allocate(binned_temp(n_binned_realspace), binned_rho(n_binned_realspace), &
+                 binned_met(n_binned_realspace), binned_veloc(n_binned_realspace))
+        allocate(binned_temp_ion(nion,n_binned_realspace), &
+                 binned_n_ion(nion,n_binned_realspace), &
+                 binned_rho_ion(nion,n_binned_realspace), &
+                 binned_veloc_ion(nion,n_binned_realspace))
+     endif
+     !
+     do i=1, n_binned_realspace
+        binned_redshift_realspace(i)  = zabsmin + dble(i-1)*pixsize/maxlambda
+     enddo
+  endif
   endif
   !
   binned_flux(:)  = 0.d0
@@ -2926,10 +2965,10 @@ subroutine rebin_spectrum
      temp_long = temp_long * rho_long
      met_long = met_long * rho_long
      veloc_long = veloc_long * rho_long
-     call rebin(rho_long,binned_rho)
-     call rebin(temp_long,binned_temp)
-     call rebin(met_long,binned_met)
-     call rebin(veloc_long,binned_veloc)
+     call rebin_realspace(rho_long,binned_rho)
+     call rebin_realspace(temp_long,binned_temp)
+     call rebin_realspace(met_long,binned_met)
+     call rebin_realspace(veloc_long,binned_veloc)
      binned_temp = binned_temp / binned_rho
      binned_met = binned_met / binned_rho
      binned_veloc = binned_veloc / binned_rho
@@ -2959,10 +2998,10 @@ subroutine rebin_spectrum
      rho_ion_long(:,:) = rho_ion_long(:,:) * n_ion_long(:,:)
      veloc_ion_long(:,:) = veloc_ion_long(:,:) * n_ion_long(:,:)
      do ion=1,nion
-        call rebin(temp_ion_long(ion,:),binned_temp_ion(ion,:))
-        call rebin(rho_ion_long(ion,:),binned_rho_ion(ion,:))
-        call rebin(veloc_ion_long(ion,:),binned_veloc_ion(ion,:))
-        call rebin(n_ion_long(ion,:),binned_n_ion(ion,:))
+        call rebin_realspace(temp_ion_long(ion,:),binned_temp_ion(ion,:))
+        call rebin_realspace(rho_ion_long(ion,:),binned_rho_ion(ion,:))
+        call rebin_realspace(veloc_ion_long(ion,:),binned_veloc_ion(ion,:))
+        call rebin_realspace(n_ion_long(ion,:),binned_n_ion(ion,:))
      enddo
      binned_temp_ion(:,:) = binned_temp_ion(:,:) / binned_n_ion(:,:)
      binned_rho_ion(:,:) = binned_rho_ion(:,:) / binned_n_ion(:,:)

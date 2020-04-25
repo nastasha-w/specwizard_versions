@@ -321,7 +321,9 @@ These are arrays of densities and temperatures, with particle properties weighte
 \item Temperature\_K
 \end{itemize}
 
-These are real space quantities, weighted by Nion.  Warning!  If all optional output is generated then output dataset can become very large!
+These are real space quantities, weighted by Nion.  If either category of real-space quantities is output, an additional array is stored: Redshift\_RealSpace, which indicates the redshift (assuming no peculiar velocities) at which the mass- and ion-weighted quantities are calculated.
+
+Warning!  If all optional output is generated then output dataset can become very large!
 
 \section{Long Spectra}
 
@@ -378,8 +380,10 @@ The mass corresponding to square pixel is then
 \end{eqnarray}
 and the corresponding mean column density is $\bar{\cal C}={\cal I}/(a\,dx)^2$, again multiplying by the scale factor $a$ to obtain a physical column density.
 
+
+
 \chapter{How specwizard works}
-Here, we give an outline of the algorithms used by specwizard to calculate the spectra.
+Here, we give an outline of the algorithms used by specwizard to calculate the spectra. This is useful for understanding the outputs, and should hopefully be helpful for modifying or debugging the code.
 
 \section{Short spectra}
 When calculating short spectra, the SPH particle data is first interpolated to a 1-dimensional grid along the line of site. This is then used to calculated the optical depth as a function of line of sight velocity. In these calculations, positions are periodic with the box size, as in the simulations being post-processed. Similarly, line-of-sight velocities are taken to be periodic, with a period equal to the Hubble flow across the box.
