@@ -408,4 +408,18 @@ Weighted line of sight properties are a function of line of sight position for t
 
 \param{spline\_interpolate} adds interpolated values to values already in the output array. Great for optical depths of different lines, but requires caution for averaged quantities.  
 
+Note that in the spectrum calculations, short spectra are calculated as a function of $\Delta v$, the velocity difference according to the Hubble flow and peculiar velocity with line of sight coordinate zero (assuming zero peculiar velocity there).
+For each pixel, this gives 
+\begin{equation}
+1 + z_{\mathrm{pix}} = (1 + z_{0}) (1 + \Delta v_{\mathrm{pix}} / c),
+\end{equation}
+in the limit of small $\Delta v$, with $z_{0}$ the redshift at the zero position of the line of sight. Using 
+\begin{equation}
+\lim_{n \rightarrow \infty} \left(1 + x/n \right)^{n} = \exp(x),
+\end{equation}  
+\begin{equation}
+1 + z_{\mathrm{pix}} = (1 + z_{0}) \exp(1 + \Delta v_{\mathrm{pix}} / c)
+\end{equation}
+for general $\Delta v$. This is used in the subroutine \param{insertspectra}, where the spectra are tabulated as a function of $\log$ wavelength, linear in $\Delta v$. This is also where the logs and exps in the setup of the long spectra come from.
+
 \end{document}

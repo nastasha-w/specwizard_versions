@@ -1391,6 +1391,7 @@ subroutine zero_spectra()
   tau_long_strongest   = 0.d0
   temp_z_ion_long      = 0.d0
   rho_z_ion_long       = 0.d0
+  veloc_z_ion_long     = 0.d0
   temp_ion_long        = 0.d0
   rho_ion_long         = 0.d0
   n_ion_long           = 0.d0
@@ -2612,13 +2613,15 @@ subroutine insertspectra(zcurrent_next)
   enddo
   voc = voc + log(1.+zcurrent)
   
-  ! Next redshift
+  ! Next redshift; exp: limit case, factors of (1 + Delta v / c) for each pixel
+  ! lim n-> inf (1 + x/n)^n = exp(x)
   zcurrent_next = (1.d0+zcurrent) *  exp(voc(nveloc) - voc(1) + pixvoc) - 1.
 
   !
   if(docycling) call shift () ! cyclically shift spectrum to have minimum HI optical depth at start/end
 
-  ! spline interpolate real-space density, density weighted temperature
+  ! spline interpolate real-space density, density weighted temperature 
+  ! voc is log(1 + z)
   vocsim = voc
   minvoc = vocsim(1)
   maxvoc = min(vocsim(nveloc),log(1.+zqso))
@@ -2675,6 +2678,7 @@ subroutine insertspectra(zcurrent_next)
         !
         ! redshift-space ion-weighted density, temperature and velocity
         if (output_zspaceopticaldepthweighted_values .and. (j .eq. 1)) then
+           vocsim(:)   = voc(:) + logl
            call spline_interpolate(&
                 nveloc,vocsim,rho_z_ion(ion,:) &
                 ,minvoc,maxvoc,ion,small_rho &
@@ -2915,6 +2919,10 @@ subroutine rebin_spectrum
   call rebin(flux_convolved,binned_flux)
   !
   if (output_realspacemassweighted_values) then
+     binned_temp(:)  = 0.d0
+     binned_rho(:)   = 0.d0
+     binned_met(:)   = 0.d0
+     binned_veloc(:) = 0.d0
      temp_long = temp_long * rho_long
      met_long = met_long * rho_long
      veloc_long = veloc_long * rho_long
