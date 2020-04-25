@@ -189,7 +189,7 @@ module my_rebin
    subroutine rebin_realspace(input,output)
      use numbers
      use spectra, only: redshift_realspace, binned_redshift_realspace, nppix,&
-                        n_binned_realspace, pixsize, lambdamax
+                        n_binned_realspace, pixsize, maxlambda
      implicit none
      real(kind=doubleR), intent(in)  :: input(:)
      real(kind=doubleR), intent(out) :: output(:)
@@ -198,7 +198,7 @@ module my_rebin
      integer :: i,j,k,ninbin
      real(kind=doubleR) :: pixsize_real
      !
-     pixsize_real = pixsize / lambdamax
+     pixsize_real = pixsize / maxlambda
      !
      j = 1
      do i = 1, n_binned_realspace
