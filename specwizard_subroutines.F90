@@ -2566,7 +2566,8 @@ subroutine allocate_spectra_long()
   if(allocated(lambda)) deallocate(lambda)
   !
   allocate(cdens_ion_integrated(nion))
-  allocate(lambda(nvpix),voverc(nppix))
+  allocate(lambda(nvpix),voverc(nvpix))
+  allocate(voverc_realspace(nppix),redshift_realspace(nppix))
   allocate(tau_long(nion,nvpix))
   allocate(tau_long_strongest(nion,nvpix))
   allocate(temp_ion_long(nion,nppix),n_ion_long(nion,nppix),rho_ion_long(nion,nppix), &
