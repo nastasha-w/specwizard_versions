@@ -2646,7 +2646,7 @@ subroutine insertspectra(zcurrent_next)
   write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
           vocsim(1), vocsim(2), vocsim(3), vocsim(nveloc)
   write(*,'("voverc_realspace: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
-          voverc_realspace(1), voverc_realspace(2), voverc_realspace(3), voverc_realspace(nppix)
+          voverc_realspace(1), voverc_realspace(2), voverc_realspace(3), voverc_realspace(4)
                   
   if(output_realspacemassweighted_values)then
      call spline_interpolate(&
