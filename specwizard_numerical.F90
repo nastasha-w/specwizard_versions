@@ -161,7 +161,7 @@ module my_rebin
    
      ! local
      integer :: i,j,k,ninbin
-     !
+     ! marker
      write(*,*) 'Rebin (wavelength space)'
      write(*,'("lambda: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
           lambda(1), lambda(2), lambda(3), lambda(nvpix)
@@ -204,7 +204,7 @@ module my_rebin
      real(kind=doubleR) :: pixsize_real
      !
      pixsize_real = pixsize / maxlambda
-     !
+     ! marker
      write(*, *) 'Rebin (z-space, no pec. vel.)'
      write(*,'("redshift_realspace: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
           redshift_realspace(1), redshift_realspace(2), redshift_realspace(3), &

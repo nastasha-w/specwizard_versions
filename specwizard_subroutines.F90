@@ -1079,11 +1079,15 @@ subroutine initialize_spectral_parameters
     lambda = minlambda * exp(voverc) 
     !
     if (output_realspacenionweighted_values .or. output_realspacemassweighted_values) then
+      ! marker
       write(*, '("Set up voverc_realspace: ", I8, " pixels, v/c = ", E12.4)') nppix, vpixsize
       do i=1, nppix
         voverc_realspace(i) = dble(i-1) * vpixsize
       enddo
+      write(*,*)'No segfaults in setting up voverc_realspace'
       redshift_realspace = exp(voverc_realspace) - 1.d0
+      ! marker
+      write(*,*)'No segfaults in setting up redshift_realspace'
     endif
     !
     !     -------------------
@@ -2562,7 +2566,7 @@ subroutine allocate_spectra_long()
   if(allocated(lambda)) deallocate(lambda)
   !
   allocate(cdens_ion_integrated(nion))
-  allocate(lambda(nvpix),voverc(nvpix))
+  allocate(lambda(nvpix),voverc(nppix))
   allocate(tau_long(nion,nvpix))
   allocate(tau_long_strongest(nion,nvpix))
   allocate(temp_ion_long(nion,nppix),n_ion_long(nion,nppix),rho_ion_long(nion,nppix), &
@@ -2642,6 +2646,7 @@ subroutine insertspectra(zcurrent_next)
   maxvoc = min(vocsim(nveloc),log(1.+zqso))
 
   ! debug info real-space values
+  ! marker
   write(*,*)'Insertspectra inputs real space'
   write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
   write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
@@ -2704,6 +2709,7 @@ subroutine insertspectra(zcurrent_next)
         ! redshift-space ion-weighted density, temperature and velocity
         if (output_zspaceopticaldepthweighted_values .and. (j .eq. 1)) then
            vocsim(:)   = voc(:) + logl
+           !marker
            write(*,*) 'Insertspectra inputs z-space'
            write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
            write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 

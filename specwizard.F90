@@ -104,6 +104,8 @@ program specwizard
   !
   ! set spectral parameters
   call initialize_spectral_parameters()
+  ! marker
+  write(*,*)'No segfaults in initialize_spectral_parameters'
   !
   ! create output file and write attributes
   if(do_long_spectrum) &
