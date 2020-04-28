@@ -1084,6 +1084,7 @@ subroutine initialize_spectral_parameters
       do i=1, nppix
         voverc_realspace(i) = dble(i-1) * vpixsize
       enddo
+      voverc_realspace = voverc_realspace + log(1.d0 + zabsmin)
       write(*,*)'No segfaults in setting up voverc_realspace'
       redshift_realspace = exp(voverc_realspace) - 1.d0
       ! marker
@@ -2710,13 +2711,6 @@ subroutine insertspectra(zcurrent_next)
         ! redshift-space ion-weighted density, temperature and velocity
         if (output_zspaceopticaldepthweighted_values .and. (j .eq. 1)) then
            vocsim(:)   = voc(:) + logl
-           !marker
-           write(*,*) 'Insertspectra inputs z-space'
-           write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
-           write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
-             vocsim(1), vocsim(2), vocsim(3), vocsim(nveloc)
-           write(*,'("voverc: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
-             voverc(1), voverc(2), voverc(3), voverc(nppix)
            call spline_interpolate(&
                 nveloc,vocsim,rho_z_ion(ion,:) &
                 ,minvoc,maxvoc,ion,small_rho &
