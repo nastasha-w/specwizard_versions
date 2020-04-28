@@ -1081,6 +1081,7 @@ subroutine initialize_spectral_parameters
     if (output_realspacenionweighted_values .or. output_realspacemassweighted_values) then
       do i=1, nppix
         voverc_realspace(i) = dble(i-1) * vpixsize
+        write(*, '("Set up voverc_realspace: ", I5, " pixels, v/c = ", f7.4,)') nppix, vpixsize
       enddo
       redshift_realspace = exp(voverc_realspace) - 1.d0
     endif
@@ -2641,12 +2642,12 @@ subroutine insertspectra(zcurrent_next)
   maxvoc = min(vocsim(nveloc),log(1.+zqso))
 
   ! debug info real-space values
-  write(*,*) 'Insertspectra inputs real space'
+  write(*,*)'Insertspectra inputs real space'
   write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
   write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
           vocsim(1), vocsim(2), vocsim(3), vocsim(nveloc)
   write(*,'("voverc_realspace: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
-          voverc_realspace(1), voverc_realspace(2), voverc_realspace(3), voverc_realspace(4)
+          voverc_realspace(1), voverc_realspace(2), voverc_realspace(3), voverc_realspace(nppix)
                   
   if(output_realspacemassweighted_values)then
      call spline_interpolate(&
