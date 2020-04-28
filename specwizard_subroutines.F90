@@ -1079,7 +1079,7 @@ subroutine initialize_spectral_parameters
     lambda = minlambda * exp(voverc) 
     !
     if (output_realspacenionweighted_values .or. output_realspacemassweighted_values) then
-      write(*, '("Set up voverc_realspace: ", I5, " pixels, v/c = ", f7.4)') nppix, vpixsize
+      write(*, '("Set up voverc_realspace: ", I8, " pixels, v/c = ", E12.4)') nppix, vpixsize
       do i=1, nppix
         voverc_realspace(i) = dble(i-1) * vpixsize
       enddo
