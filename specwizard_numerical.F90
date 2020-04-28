@@ -206,10 +206,10 @@ module my_rebin
      pixsize_real = pixsize / maxlambda
      ! marker
      write(*, *) 'Rebin (z-space, no pec. vel.)'
-     write(*,'("redshift_realspace: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
+     write(*,'("redshift_realspace: ",f10.6,", ", f10.6, ", ", f10.6, " ... ", f10.6)') & 
           redshift_realspace(1), redshift_realspace(2), redshift_realspace(3), &
           redshift_realspace(nppix)
-     write(*,'("binned_redshift_realspace: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
+     write(*,'("binned_redshift_realspace: ",f10.6,", ", f10.6, ", ",f10.6," ... ",f10.6)') & 
           binned_redshift_realspace(1), binned_redshift_realspace(2), &
           binned_redshift_realspace(3), binned_redshift_realspace(n_binned_realspace)
      !
