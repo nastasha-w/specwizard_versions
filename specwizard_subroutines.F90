@@ -2640,6 +2640,14 @@ subroutine insertspectra(zcurrent_next)
   minvoc = vocsim(1)
   maxvoc = min(vocsim(nveloc),log(1.+zqso))
 
+  ! debug info real-space values
+  write(*,'Insertspectra inputs real space')
+  write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
+  write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
+          vocsim(1), vocsim(2), vocsim(3), vocsim(nveloc)
+  write(*,'("voverc_realspace: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
+          voverc_realspace(1), voverc_realspace(2), voverc_realspace(3), voverc_realspace(nppix)
+                  
   if(output_realspacemassweighted_values)then
      call spline_interpolate(&
           nveloc,vocsim,rho_tot &
@@ -2657,7 +2665,8 @@ subroutine insertspectra(zcurrent_next)
      call spline_interpolate(&
           nveloc,vocsim,veloc_tot &
           ,minvoc,maxvoc,1,small_velocity &
-          ,nppix,voverc_realspace,veloc_long,is_positive=.false.)
+          ,nppix,voverc_realspace,veloc_long,&
+          is_positive=.false., loginterpolate=.false.)
   endif
   !
   if (output_realspacenionweighted_values) then
@@ -2678,7 +2687,8 @@ subroutine insertspectra(zcurrent_next)
         call spline_interpolate(&
              nveloc,vocsim,veloc_ion(ion,:) &
              ,minvoc,maxvoc,1,small_velocity &
-             ,nppix,voverc_realspace,veloc_ion_long(ion,:),is_positive=.false.)
+             ,nppix,voverc_realspace,veloc_ion_long(ion,:),&
+             is_positive=.false., loginterpolate=.false.)
     enddo
   endif
   !
@@ -2693,6 +2703,12 @@ subroutine insertspectra(zcurrent_next)
         ! redshift-space ion-weighted density, temperature and velocity
         if (output_zspaceopticaldepthweighted_values .and. (j .eq. 1)) then
            vocsim(:)   = voc(:) + logl
+           write(*,'Insertspectra inputs z-space')
+           write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
+           write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
+             vocsim(1), vocsim(2), vocsim(3), vocsim(nveloc)
+           write(*,'("voverc: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
+             voverc(1), voverc(2), voverc(3), voverc(nppix)
            call spline_interpolate(&
                 nveloc,vocsim,rho_z_ion(ion,:) &
                 ,minvoc,maxvoc,ion,small_rho &
@@ -2704,7 +2720,8 @@ subroutine insertspectra(zcurrent_next)
            call spline_interpolate(&
                 nveloc,vocsim,veloc_z_ion(ion,:)&
                 ,minvoc,maxvoc,ion,small_velocity&
-                ,nvpix,voverc,veloc_z_ion_long(ion,:),is_positive=.false.)
+                ,nvpix,voverc,veloc_z_ion_long(ion,:),&
+                is_positive=.false., loginterpolate=.false.)
         endif 
         if (minvoc .le. voverc(nvpix) .and.  maxvoc .ge. voverc(1)) then 
            if (lambda_rest(ion,j) .gt. 1.001 * lyalpha) then
