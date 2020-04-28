@@ -277,8 +277,8 @@ fwhm = 6.6          % FWHM of instrumental broadening (Gaussian) in km/s
 % Required when do_long_spectrum = T
 % ------------------------------------------------------
 zqso       = 0.4    % QSO redshift
-minlambda  = 3650.0 % Min observed wavelength (A)
-maxlambda  = 9600.0 % Max observed wavelength (A)
+minlambda  = 700.0  % Min observed wavelength (A)
+maxlambda  = 3000.0 % Max observed wavelength (A)
 zabsmin    = 0.1    % Min allowed absorption redshift 
 zabsmax    = 0.35   % Max allowed absorption redshift 
 nlyman     = -1     % Number of Lyman lines (1 = Ly-alpha, 2 =
