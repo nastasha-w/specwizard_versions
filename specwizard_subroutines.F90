@@ -1081,7 +1081,7 @@ subroutine initialize_spectral_parameters
     if (output_realspacenionweighted_values .or. output_realspacemassweighted_values) then
       do i=1, nppix
         voverc_realspace(i) = dble(i-1) * vpixsize
-        write(*, '("Set up voverc_realspace: ", I5, " pixels, v/c = ", f7.4,)') nppix, vpixsize
+        write(*, '("Set up voverc_realspace: ", I5, " pixels, v/c = ", f7.4)') nppix, vpixsize
       enddo
       redshift_realspace = exp(voverc_realspace) - 1.d0
     endif
