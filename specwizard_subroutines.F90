@@ -2641,7 +2641,7 @@ subroutine insertspectra(zcurrent_next)
   maxvoc = min(vocsim(nveloc),log(1.+zqso))
 
   ! debug info real-space values
-  write(*,'Insertspectra inputs real space')
+  write(*,*) 'Insertspectra inputs real space'
   write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
   write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
           vocsim(1), vocsim(2), vocsim(3), vocsim(nveloc)
@@ -2703,7 +2703,7 @@ subroutine insertspectra(zcurrent_next)
         ! redshift-space ion-weighted density, temperature and velocity
         if (output_zspaceopticaldepthweighted_values .and. (j .eq. 1)) then
            vocsim(:)   = voc(:) + logl
-           write(*,'Insertspectra inputs z-space')
+           write(*,*) 'Insertspectra inputs z-space'
            write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
            write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
              vocsim(1), vocsim(2), vocsim(3), vocsim(nveloc)
