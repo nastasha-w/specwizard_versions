@@ -17,9 +17,9 @@ snap_base       =  snap_027_z000p101 % keep same as last directory above (part b
 % this file must be present inside datadir or SpecWizard will crash -> not true, another path works fine.
 % the file_list file can also be used to consider only a subset of the
 % available data.
-file_list       =  ../los/files_z1p5z5 % vestigial from OWLS
+file_list       =  ../los/files_z1p5z5 % needed only in long spectrum mode
 %Directory to write output files:
-outputdir       = /cosma5/data/dp004/dc-wije1/specwiz/longspec_test3/
+outputdir       = /cosma5/data/dp004/dc-wije1/specwiz/longspec_test4/
 
 %If true then write frequencies to output files, rather than wavelengths:
 output_frequency  = F
@@ -277,8 +277,8 @@ fwhm = 6.6          % FWHM of instrumental broadening (Gaussian) in km/s
 % Required when do_long_spectrum = T
 % ------------------------------------------------------
 zqso       = 3.5    % QSO redshift
-minlambda  = 3660.0 % Min observed wavelength (A)
-maxlambda  = 9590.0 % Max observed wavelength (A)
+minlambda  = 3650.0 % Min observed wavelength (A)
+maxlambda  = 9600.0 % Max observed wavelength (A)
 zabsmin    = 1.6    % Min allowed absorption redshift 
 zabsmax    = 5.0    % Max allowed absorption redshift 
 nlyman     = -1     % Number of Lyman lines (1 = Ly-alpha, 2 =
