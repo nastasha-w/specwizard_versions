@@ -1063,7 +1063,7 @@ subroutine initialize_spectral_parameters
     ! number of pixels for the real space weighted arrays (function of z)
     nppix = log((1.d0 + zabsmin)/(1.d0 + zabsmin))/(1e5*vpixsizekms)*LightSpeed
     !
-    call allocate_spectra_long()  ! size nvpix
+    call allocate_spectra_long()  ! size nvpix or nppix
     !
     vpixsize = vpixsizekms * 1e5 / LightSpeed
     if(MyPE == 0) then
@@ -1079,12 +1079,13 @@ subroutine initialize_spectral_parameters
     lambda = minlambda * exp(voverc) 
     !
     if (output_realspacenionweighted_values .or. output_realspacemassweighted_values) then
+      write(*, '("Set up voverc_realspace: ", I5, " pixels, v/c = ", f7.4)') nppix, vpixsize
       do i=1, nppix
         voverc_realspace(i) = dble(i-1) * vpixsize
-        write(*, '("Set up voverc_realspace: ", I5, " pixels, v/c = ", f7.4)') nppix, vpixsize
       enddo
       redshift_realspace = exp(voverc_realspace) - 1.d0
     endif
+    write(*, '(f7.4)') voverc_realspace(1)
     !
     !     -------------------
     !     Read in noise file.
