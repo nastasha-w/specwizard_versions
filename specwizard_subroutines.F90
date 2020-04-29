@@ -1763,7 +1763,7 @@ subroutine projectdata()
       if (n_ion(ii,i) .gt. 0.) then 
         veloc_ion(ii,i) = veloc_ion(ii,i) / n_ion(ii,i)
         temp_ion(ii,i)  = temp_ion(ii,i) / n_ion(ii,i)
-        rho_ion(ii,i)   = rho_ion(ii,i) / n_ion(ii,i) ! rho_ion was already cgs
+        rho_ion(ii,i)   = rho_ion(ii,i) / n_ion(ii,i) / rhocb ! rho_ion was already cgs -> overdensity (right scaling per output time for long spectra)
       endif
       n_ion(ii,i) = n_ion(ii,i) * DensCon ! ions/cm^3
     enddo
@@ -1774,7 +1774,7 @@ subroutine projectdata()
       veloc_tot(i) = veloc_tot(i) / rho_tot(i)
       temp_tot(i)  = temp_tot(i)  / rho_tot(i)
       met_tot(i)   = met_tot(i)   / rho_tot(i)
-      rho_tot(i)   = rho_tot(i) * DensCon ! g/cm^3
+      rho_tot(i)   = rho_tot(i) * DensCon / rhocb ! g/cm^3, -> overdensity (right scaling per output time for long spectra)
     endif
   enddo
   !
@@ -2420,7 +2420,7 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
       call hdf5_write_data(file_handle, trim(VarName),n_ion(ion,:), gzip=16)
       ! Real space, n_ion.-weighted overdensity
       VarName = trim(ElementGroup)//'OverDensity'
-      call hdf5_write_data(file_handle,trim(VarName),rho_ion(ion,:)/rhocb, gzip=16) !Old version: n_ion(ion,:)*ion_mass(ion)/rhocb
+      call hdf5_write_data(file_handle,trim(VarName),rho_ion(ion,:), gzip=16) !Old version: n_ion(ion,:)*ion_mass(ion)/rhocb
       ! Real space, n_ion-weighted temperature. 
       VarName = trim(ElementGroup)//'Temperature_K'
       call hdf5_write_data(file_handle, trim(VarName),temp_ion(ion,:), gzip=16)
@@ -2434,7 +2434,7 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
     VarName      = trim(MassWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
     call hdf5_write_data(file_handle,trim(varname),veloc_tot, gzip=16)
     VarName      = trim(MassWeightedGroup)//'/OverDensity'
-    call hdf5_write_data(file_handle,trim(varname),rho_tot/rhocb, gzip=16)
+    call hdf5_write_data(file_handle,trim(varname),rho_tot, gzip=16)
     VarName      = trim(MassWeightedGroup)//'/Temperature_K'
     call hdf5_write_data(file_handle,trim(varname),temp_tot, gzip=16)
     !
@@ -2857,7 +2857,7 @@ subroutine write_long_spectrum()
       VarName      = trim(MassWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
       call hdf5_write_data(file_handle,trim(varname),binned_veloc, gzip=16)
       VarName      = trim(MassWeightedGroup)//'/OverDensity'
-      call hdf5_write_data(file_handle,trim(varname),binned_rho/rhocb, gzip=16)
+      call hdf5_write_data(file_handle,trim(varname),binned_rho, gzip=16)
       VarName      = trim(MassWeightedGroup)//'/Temperature_K'
       call hdf5_write_data(file_handle,trim(varname),binned_temp, gzip=16)
       !
