@@ -40,10 +40,10 @@ def checksame_attrs(group1, group2, name1='group1', name2='group2'):
     
     allsame = allsame and len(keys_only1) == 0 and len(keys_only2) == 0
     if len(keys_only1) > 0:
-        print('{g1} contain keys {g2} does not:\n{keys}'.format(\
+        print('{g1} contains keys {g2} does not:\n{keys}'.format(\
               keys=keys_only1, **kwfmt))
     if len(keys_only2) > 0:
-        print('{g2} contain keys {g1} does not:\n{keys}'.format(\
+        print('{g2} contains keys {g1} does not:\n{keys}'.format(\
               keys=keys_only2, **kwfmt))
     matchdct = {key: np.all(attrs1[key] == attrs2[key]) for key in keys_both}
     keymatch = np.all([matchdct[key] for key in matchdct])
