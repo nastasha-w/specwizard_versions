@@ -127,7 +127,7 @@ def testsame_shortspectra(filen1, filen2, specnums='all',\
                         'Parameters/SpecWizardRuntimeParameters',\
                         'Projection',\
                         'Units']
-    checksame_arrays_sn = ['Projection/ncontr',\
+    checksame_arns_sn = ['Projection/ncontr',\
                            'Projection/x_fraction_array',\
                            'Projection/y_fraction_array']
     checksame_arns = ['VHubble_KMpS']
@@ -196,7 +196,7 @@ def testsame_shortspectra(filen1, filen2, specnums='all',\
                 return False
         
         # check general arrays pertaining to spectra
-        for aname in checksame_arrays_sn:
+        for aname in checksame_arns_sn:
             a1 = f1[aname][:][specnums]
             a2 = f2[aname][:][specnums]
             
