@@ -1900,7 +1900,7 @@ subroutine makespectra()
     flux_ion(ion,:)    = exp(-tau(:))
     veloc_z_ion(ion,:) = velocw(:)
     nion_z_ion(ion,:)  = nionw(:)
-    rho_z_ion(ion,:)   = rhow(:)/rhocb ! density in units of mean baryon density
+    rho_z_ion(ion,:)   = rhow(:) ! input density already in units of mean baryon density
     temp_z_ion(ion,:)  = tempw(:)
     !
   enddo
