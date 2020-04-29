@@ -54,7 +54,7 @@ def checksame_attrs(group1, group2, name1='group1', name2='group2'):
         print('{g1} and {g2} had different values for some attributes:'.format(\
               **kwfmt))
         for key in mismatch:
-            print('{key}: \t {group1}: {at1} \t {group2}: {at2}'.format(\
+            print('{key}: \t {g1}: {at1} \t {g2}: {at2}'.format(\
                   key=key, at1=attrs1[key], at2=attrs2[key], **kwfmt))
     return allsame
 
