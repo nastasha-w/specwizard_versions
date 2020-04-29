@@ -1900,7 +1900,7 @@ subroutine makespectra()
     flux_ion(ion,:)    = exp(-tau(:))
     veloc_z_ion(ion,:) = velocw(:)
     nion_z_ion(ion,:)  = nionw(:)
-    rho_z_ion(ion,:)   = rhow(:)/rhocb ! density in units of mean baryon density
+    rho_z_ion(ion,:)   = rhow(:) ! input density already in units of mean baryon density
     temp_z_ion(ion,:)  = tempw(:)
     !
   enddo
@@ -2673,8 +2673,7 @@ subroutine insertspectra(zcurrent_next)
      call spline_interpolate(&
           nveloc,vocsim,veloc_tot &
           ,minvoc,maxvoc,1,small_velocity &
-          ,nppix,voverc_realspace,veloc_long,&
-          is_positive=.false., loginterpolate=.false.)
+          ,nppix,voverc_realspace,veloc_long)
   endif
   !
   if (output_realspacenionweighted_values) then
@@ -2695,8 +2694,7 @@ subroutine insertspectra(zcurrent_next)
         call spline_interpolate(&
              nveloc,vocsim,veloc_ion(ion,:) &
              ,minvoc,maxvoc,1,small_velocity &
-             ,nppix,voverc_realspace,veloc_ion_long(ion,:),&
-             is_positive=.false., loginterpolate=.false.)
+             ,nppix,voverc_realspace,veloc_ion_long(ion,:))
     enddo
   endif
   !
@@ -2722,8 +2720,7 @@ subroutine insertspectra(zcurrent_next)
            call spline_interpolate(&
                 nveloc,vocsim,veloc_z_ion(ion,:)&
                 ,minvoc,maxvoc,ion,small_velocity&
-                ,nvpix,voverc,veloc_z_ion_long(ion,:),&
-                is_positive=.false., loginterpolate=.false.)
+                ,nvpix,voverc,veloc_z_ion_long(ion,:))
         endif 
         if (minvoc .le. voverc(nvpix) .and.  maxvoc .ge. voverc(1)) then 
            if (lambda_rest(ion,j) .gt. 1.001 * lyalpha) then

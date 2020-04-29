@@ -7,6 +7,8 @@ module my_spline_interpolation
      module procedure spline_interpolate
   end interface
 contains
+  ! is_positive and log_interpolate: use depends on the presence of the arguments
+  ! (present -> true), actual values don't matter
   subroutine spline_interpolate(nin,inx,iny,minvoc,maxvoc,ion,minbother,nout,outx,outy,loginterpolate,is_positive)
     use numbers
     use spectra, only : work, work2, ions
