@@ -35,7 +35,7 @@ contains
     if(present(loginterpolate))then
        loginterpolate_use = loginterpolate
     else
-       loginterpolate = .false.
+       loginterpolate_use = .false.
     endif
     !
     call cpu_timer_start(dointerpolate)
