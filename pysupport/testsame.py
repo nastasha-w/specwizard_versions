@@ -130,7 +130,7 @@ def testsame_shortspectra(filen1, filen2, specnums='all',\
     checksame_arrays_sn = ['Projection/ncontr',\
                            'Projection/x_fraction_array',\
                            'Projection/y_fraction_array']
-    checksame_arrays = ['VHubble_KMpS']
+    checksame_arns = ['VHubble_KMpS']
     
     sgrps_mass = ['LOSPeculiarVelocity_KMpS',\
                   'MetalMassFraction',\
@@ -161,7 +161,7 @@ def testsame_shortspectra(filen1, filen2, specnums='all',\
             gn2 = name2 + ' ' + path
             asame &= checksame_attrs(f1[path], f2[path], name1=gn1, name2=gn2)
         # check arrays not specific to spectra
-        for aname in checksame_arrays:
+        for aname in checksame_arns:
             identical, similar = checksame_arrays(f1, f2, aname, **kwa)
             didentical &= identical
             dsimilar &= similar
