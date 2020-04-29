@@ -56,6 +56,7 @@ def checksame_attrs(group1, group2, name1='group1', name2='group2'):
         for key in mismatch:
             print('{key}: \t {group1}: {at1} \t {group2}: {at2}'.format(\
                   key=key, at1=attrs1[key], at2=attrs2[key], **kwfmt))
+    return allsame
 
 def checksame_arrays(f1, f2, path, name1='file1', name2='file2',\
                      kw_allclose=None):
