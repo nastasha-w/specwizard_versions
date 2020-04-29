@@ -1763,7 +1763,10 @@ subroutine projectdata()
       if (n_ion(ii,i) .gt. 0.) then 
         veloc_ion(ii,i) = veloc_ion(ii,i) / n_ion(ii,i)
         temp_ion(ii,i)  = temp_ion(ii,i) / n_ion(ii,i)
-        rho_ion(ii,i)   = rho_ion(ii,i) / n_ion(ii,i) / rhocb ! rho_ion was already cgs -> overdensity (right scaling per output time for long spectra)
+        ! rho_ion was already cgs -> overdensity (right scaling per output time for long spectra)
+        ! rhocb is at snapshot expansion factor, but densities are rescaled to acurrent 
+        ! -> rescale normalizing rhocb same way
+        rho_ion(ii,i)   = rho_ion(ii,i) / n_ion(ii,i) / (rhocb * densscale)
       endif
       n_ion(ii,i) = n_ion(ii,i) * DensCon ! ions/cm^3
     enddo
