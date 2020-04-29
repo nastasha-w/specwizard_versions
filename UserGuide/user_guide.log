@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.10.1)  25 APR 2020 17:16
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.10.1)  29 APR 2020 19:33
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -63,7 +63,7 @@ File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
 
 {/usr/local/texlive/2019/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <24.88> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 54.
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 56.
  (./user_guide.toc
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 1.
@@ -81,8 +81,8 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 ]
 Chapter 1.
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <20.74> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 56.
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 60.
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 58.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 62.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 ) [3
@@ -90,7 +90,7 @@ File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 ]
 Chapter 2.
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 81.
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 83.
 [4
 
 ] [5] [6] [7] [8] [9] [10] [11]
@@ -98,20 +98,20 @@ Chapter 3.
 [12
 
 ] [13] [14]
-Overfull \hbox (89.17622pt too wide) in alignment at lines 377--380
+Overfull \hbox (89.17622pt too wide) in alignment at lines 398--401
  [][][] []
  []
 
-[15]
+[15] [16]
 Chapter 4.
-[16
+[17
 
-] [17] [18] (./user_guide.aux) ) 
+] [18] [19] (./user_guide.aux) ) 
 Here is how much of TeX's memory you used:
- 466 strings out of 492616
- 5626 string characters out of 6129481
- 67915 words of memory out of 5000000
- 4438 multiletter control sequences out of 15000+600000
+ 467 strings out of 492616
+ 5634 string characters out of 6129481
+ 68915 words of memory out of 5000000
+ 4439 multiletter control sequences out of 15000+600000
  14582 words of font info for 38 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  23i,11n,43p,954b,268s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -129,10 +129,10 @@ b></usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb
 /usr/local/texlive/2019/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/loc
 al/texlive/2019/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/local/texl
 ive/2019/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb>
-Output written on user_guide.pdf (18 pages, 182609 bytes).
+Output written on user_guide.pdf (19 pages, 184080 bytes).
 PDF statistics:
- 115 PDF objects out of 1000 (max. 8388607)
- 81 compressed objects within 1 object stream
+ 119 PDF objects out of 1000 (max. 8388607)
+ 84 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -46,8 +46,10 @@
 \begin{Large}Tom Theuns\linebreak\end{Large}
 {\large tom.theuns@durham.ac.uk}\vspace{0.5cm}\linebreak
 \begin{Large}Craig Booth\linebreak\end{Large}
-{\large booth@strw.leidenuniv.nl}
-\vspace{8cm}\linebreak
+{\large booth@strw.leidenuniv.nl} \vspace{2cm}\linebreak
+\begin{large}minor user guide updates by Nastasha Wijers\linebreak\end{large}
+{wijers@strw.leidenuniv.nl}
+\vspace{6cm}\linebreak
 \today
 \end{center}
 \pagebreak
@@ -108,7 +110,7 @@ OR if use\_snapshot\_file is true, this must be the directory containing the sna
 \paramdescription{If we are using a snapshot file then we have the option of specifying LOS coordinates.  If this is T then LOS coordinates are random, if it is F then LOS coordinates are drawn from the file {\tt los\_coordinates\_file}}
 
 \paramdefinition{los\_coordinates\_file}{string}{}
-\paramdescription{An ascii file containing LOS coordinates for SW. The first line simply contains the number of coordinates in the file. The rest of the file has 5 columns: x y z phi theta}
+\paramdescription{An ascii file containing LOS coordinates for SW. The first line simply contains the number of coordinates in the file. The rest of the file has 5 columns: x y z phi theta. In Ali Rahmati's version (default in this branch), the file only has three columns: x, y, z (tab-separated). Lines of sight are always along the z axis, and z is assumed to be zero. The x and y coordinates are the (x, y)-postion of the sightline, in units of the box size. (So x and y are fractions of the total size of the box.)}
 
 \paramdefinition{file\_list}{string}{}
 \paramdescription{An ascii file called {\tt file\_list} must be present inside of {\tt datadir}.  This file must contain a list of LOS files, with one file per line.  If this file is not present SpecWizard will crash. Update: this variable must contain the full path to the file containing the list of LOS files. It can be in \param{datadir} or somewhere else; both work.}
@@ -120,13 +122,13 @@ OR if use\_snapshot\_file is true, this must be the directory containing the sna
 \paramdescription{If T then write frequencies to output files, if F then work with wavelengths}
 
 \paramdefinition{gimic}{logical}{}
-\paramdescription{If F then we are using OWLS simulations; if T then we are using GIMIC}
+\paramdescription{If F then we are using OWLS simulations or Eagle; if T then we are using GIMIC}
 
 \paramdefinition{overwrite}{logical}{}
 \paramdescription{If F then if the output file already exists SpecWizard will crash.  If T then old files will be overwritten}
 
 \paramdefinition{urchin}{logical}{}
-\paramdescription{If T then read the neutral fraction for H1 (Si2) from post-processed snapshot files rather than lookup the ionization balance}
+\paramdescription{If T then read the neutral fraction for H1 (Si2) from post-processed snapshot files rather than lookup the ionization balance. (Those files are not present for Eagle, to the best of my knowledge.)}
 
 \paramdefinition{urchindir}{string}{}
 \paramdescription{If urchin: The directory containing the post-processed snapshot files}
@@ -167,7 +169,7 @@ OR if use\_snapshot\_file is true, this must be the directory containing the sna
 \paramdescription{If this is true then modify the simulation metal abundances, in one of a number of ways described by the parameters in this section.  If this is F then all further variables in this section are ignored, and the simulation abundances are used}
 
 \paramdefinition{use\_smoothed\_abundance}{logical}{}
-\paramdescription{If true, reads the smoothed element abundance in place of the true element abundance}
+\paramdescription{If true, reads the smoothed element abundance in place of the true element abundance. This will not work for the Eagle line-of-sight files, which do not contain smoothed abundances.}
 
 \paramdefinition{maxz\_rel}{real}{Z$_{\odot}$}
 \paramdescription{If either {\tt impose\_z\_rho\_relation} or {\tt log\_normal\_scatter} are T, then limit the maximum metallicity with this parameter.  $Z_{\odot}$ is hardcoded into the source file specwizard\_modules.F90, and has a value of 0.0126637  (=$M_{Metal,\odot}/M_{tot,\odot}$}
@@ -218,16 +220,16 @@ OR if use\_snapshot\_file is true, this must be the directory containing the sna
 \section{Accuracy Parameters}
 
 \paramdefinition{minbother\_blue}{real}{}
-\paramdescription{Accuracy parameter, minimum optical depth to consider for transitions with rest-frame wavelength shorter than that of H{\sc i} Ly$\alpha$.  The smaller this number the more accurate the results, but the slower the code will run.}
+\paramdescription{Accuracy parameter, minimum optical depth to consider for transitions with rest-frame wavelength shorter than that of H{\sc i} Ly$\alpha$.  The smaller this number the more accurate the results, but the slower the code will run. This is the maximum optical depth allowed to be missed in a short spectrum pixel.}
 
 \paramdefinition{minbother\_red}{real}{}
-\paramdescription{Accuracy parameter, minimum optical depth to consider for transitions with rest-frame wavelength longer than that of H{\sc i} Ly$\alpha$.  The smaller this number the more accurate the results, but the slower the code will run.}
+\paramdescription{Accuracy parameter, minimum optical depth to consider for transitions with rest-frame wavelength longer than that of H{\sc i} Ly$\alpha$.  The smaller this number the more accurate the results, but the slower the code will run. This is the maximum optical depth allowed to be missed in a short spectrum pixel.}
 
 \paramdefinition{limsigma}{logical}{}
-\paramdescription{Accuracy parameter. If true, the line profile is only calculated over the velocity range where the optical depth is above {\tt minbother} divided by the number of pixels. This means that, at most, a total amount of absorption {\tt minbother} is missed in each pixel.}
+\paramdescription{Accuracy parameter. If true, the line profile is only calculated over the velocity range where the optical depth is above {\tt minbother} divided by the number of pixels. This means that, at most, a total amount of absorption {\tt minbother} is missed in each pixel. (The minbother results still affect the spectra if this is False: they also determine whether the maximum optical depth from a real space pixel is large enough to bother adding to the optical depth spectrum.)}
 
 \paramdefinition{vpixsizekms}{real}{km/s}
-\paramdescription{Pixel size in km/s.  For short spectra this represents the final output pixel size.  for long spectra this represents the pixel size before rebinning into. SpecWizard will stop if this is too small compared with the other parameters. The smaller this number the more accurate the results, but the slower the code will run. Note that this also sets the resolution at which the position-space ion densities and ion-weighted temperatures and peculiar velocities are calculated. The shape and width of the spectral features can therefore be affected if these values are too low.}
+\paramdescription{Pixel size in km/s.  For short spectra this represents the final output pixel size.  For long spectra this represents the pixel size before rebinning into. SpecWizard will stop if this is too small compared with the other parameters. The smaller this number the more accurate the results, but the slower the code will run. Note that this also sets the resolution at which the position-space ion densities and ion-weighted temperatures and peculiar velocities are calculated. The shape and width of the spectral features can therefore be affected if this value is too low.}
 
 \section{Parameters For Long Spectrum}
 \paramdefinition{zqso}{real}{}
@@ -330,14 +332,33 @@ Warning!  If all optional output is generated then output dataset can become ver
 Each spectrum group contains an array, {\tt Flux}, containing the total normalized, transmitted flux as a function of wavelength.  If noise has been specified then two additional arrays are present, called {\tt Gaussian\_deviate} and {\tt Noise\_Sigma}.  An additional group, called {\tt ShortSpectraInfo} contains information so that the exact lines of sight used from the LOS files may be looked up.  Finally, the spectrum group contains a sub-group for each individual ion, if {\tt output\_zspaceopticaldepthweighted\_values} is true then this group contains a subgroup {\tt RedshiftSpaceOpticalDepth}with the following arrays:
 
 \begin{itemize}
-\item RedshiftSpaceOpticalDepthOfStrongestTransition (in the ion group, not the optical depth group)
-\item LogColumnDensity (in the ion group, not the optical depth group)
+\item RedshiftSpaceOpticalDepthOfStrongestTransition (in the ion group, not the optical depth group; the weight itself, not optical-depth-weighted)
+\item LogColumnDensity (in the ion group, not the optical depth group). Total value along the line of sight. Short spectrum contributions are printed in the log file if \param{verbose} is True.)
 \item OverDensity
 \item Temperature\_K
 \item LOSPeculiarVelocity\_KMpS
 \end{itemize}
 
 Each of the arrays is of the same size as {\tt /Wavelength\_Ang}, and describes the overdensity, temperature, and peculiar velocity of each pixel, where gas particle properties have been weighted by their contribution to the optical depth.
+
+If \param{output\_realspacemassweighted\_values} is True, the spectrum group contains a \param{RealSpaceMassWeighted} subgroup with the following arrays:
+\begin{itemize}
+\item MetalMassFraction 
+\item OverDensity (the weight itself, not mass-weighted)
+\item Temperature\_K
+\item LOSPeculiarVelocity\_KMpS
+\end{itemize}
+
+If \param{output\_realspacenionweighted\_values} is True, the ion groups contain a \param{RealSpaceNionWeighted} subgroup with the following arrays:
+\begin{itemize}
+\item NIon\_CM3  (the weight itself, in the ion group)
+\item OverDensity 
+\item Temperature\_K
+\item LOSPeculiarVelocity\_KMpS
+\end{itemize}
+
+The real-space arrays show properties as a function of redshift along the line of sight (ignoring peculiar velocities), at the redshift resolution at the largest used wavelength in the spectrum. Depending on the redshift and wavelength ranges, these arrays can be very large. The redshifts these arrays correspond to are stored in the \param{Redshift\_RealSpace} array in the spectrum group. (It could be moved to the root group along with the wavelengths.)
+
 
 \section{Normalised Gaussians}
 We use error functions instead of the M4 kernel to obtain integrals over bins. To do so we replace the M4 SPH spline with a function which is a produce of 1D Gaussians,
@@ -422,7 +443,7 @@ in the limit of small $\Delta v$, with $z_{0}$ the redshift at the zero position
 \lim_{n \rightarrow \infty} \left(1 + x/n \right)^{n} = \exp(x),
 \end{equation}  
 \begin{equation}
-1 + z_{\mathrm{pix}} = (1 + z_{0}) \exp(1 + \Delta v_{\mathrm{pix}} / c)
+1 + z_{\mathrm{pix}} = (1 + z_{0}) \exp(\Delta v_{\mathrm{pix}} / c)
 \end{equation}
 for general $\Delta v$. This is used in the subroutine \param{insertspectra}, where the spectra are tabulated as a function of $\log$ wavelength, linear in $\Delta v$. This is also where the logs and exps in the setup of the long spectra come from.
 
