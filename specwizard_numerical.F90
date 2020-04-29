@@ -7,8 +7,6 @@ module my_spline_interpolation
      module procedure spline_interpolate
   end interface
 contains
-  ! is_positive and log_interpolate: use depends on the presence of the arguments
-  ! (present -> true), actual values don't matter
   subroutine spline_interpolate(nin,inx,iny,minvoc,maxvoc,ion,minbother,nout,outx,outy,loginterpolate,is_positive)
     use numbers
     use spectra, only : work, work2, ions
@@ -26,19 +24,31 @@ contains
     real(kind=doubleR), parameter     :: big=2.d30
     real(kind=doubleR)                :: result
     integer i
-
+    logical :: loginterpolate_use, is_positive_use
+    !    
+    ! set defaults
+    if present(is_positive) then
+       is_positive_use = is_positive
+    else
+       is_positive_use = .false.
+    endif
+    if present(loginterpolate) then
+       loginterpolate_use = loginterpolate
+    else
+       loginterpolate = .false.
+    endif
     !
     call cpu_timer_start(dointerpolate)
     call spline(inx,iny,nin,big,big,work,work2)
     do i=1, nout
        if(outx(i) .ge. minvoc .and. outx(i) .lt. maxvoc)then
           call splint(inx,iny,work,nin,outx(i),result)
-          if(present(loginterpolate))then
+          if(loginterpolate_use)then
              if(result .lt. -minbother) then
                 result = linint(nin,inx,iny,outx(i),ions(ion))
              endif
           endif
-          if(present(is_positive))then
+          if(is_positive_use)then
              if(result .lt. 0) result = 0.
           endif
        else
