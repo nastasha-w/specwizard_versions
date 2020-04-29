@@ -175,7 +175,9 @@ def testsame_shortspectra(filen1, filen2, specnums='all',\
                 print('{f1} but not {f2}: {k1}'.format(k1=sorted(list(sks1 - sks2)), **kwfmt))
                 print('{f2} but not {f1}: {k2}'.format(k2=sorted(list(sks2 - sks1)), **kwfmt))
                 return False
-            specgroups = sorted(list(sks1), key=lambda grn: int(grn[7:]))
+            specgroups = set(sk if 'Spectrum' in sk else None for sk in sks1)
+            specgroups -= {None}
+            specgroups = sorted(list(specgroups), key=lambda grn: int(grn[7:]))
             specnums = np.array([int(grn[7:]) for grn in specgroups])
         else:
             specnums = np.array(sorted(list(specnums)))
