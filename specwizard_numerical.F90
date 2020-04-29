@@ -27,12 +27,12 @@ contains
     logical :: loginterpolate_use, is_positive_use
     !    
     ! set defaults
-    if present(is_positive) then
+    if(present(is_positive))then
        is_positive_use = is_positive
     else
        is_positive_use = .false.
     endif
-    if present(loginterpolate) then
+    if(present(loginterpolate))then
        loginterpolate_use = loginterpolate
     else
        loginterpolate = .false.
