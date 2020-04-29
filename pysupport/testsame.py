@@ -83,8 +83,8 @@ def checksame_arrays(f1, f2, path, name1='file1', name2='file2',\
     identical = True
     kwfmt = {'f1': name1, 'f2': name2}
     
-    a1 = f1[path][:]
-    a2 = f2[path][:]
+    a1 = np.array(f1[path])
+    a2 = np.array(f2[path])
     identical = np.all(a1 == a2)
     if not identical:
         print('{f1} and {f2} do not have identical {aname}'.format(\
