@@ -173,12 +173,11 @@ module my_rebin
    
      ! local
      integer :: i,j,k,ninbin
-     ! marker
-     write(*,*) 'Rebin (wavelength space)'
-     write(*,'("lambda: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
-          lambda(1), lambda(2), lambda(3), lambda(nvpix)
-     write(*,'("binned_lambda: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
-          binned_lambda(1), binned_lambda(2), binned_lambda(3), binned_lambda(n_binned_flux)
+     !write(*,*) 'Rebin (wavelength space)'
+     !write(*,'("lambda: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
+     !     lambda(1), lambda(2), lambda(3), lambda(nvpix)
+     !write(*,'("binned_lambda: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
+     !     binned_lambda(1), binned_lambda(2), binned_lambda(3), binned_lambda(n_binned_flux)
 
      j = 1
      do i = 1, n_binned_flux
@@ -216,14 +215,14 @@ module my_rebin
      real(kind=doubleR) :: pixsize_real
      !
      pixsize_real = pixsize / maxlambda
-     ! marker
-     write(*, *) 'Rebin (z-space, no pec. vel.)'
-     write(*,'("redshift_realspace: ",f10.6,", ", f10.6, ", ", f10.6, " ... ", f10.6)') & 
-          redshift_realspace(1), redshift_realspace(2), redshift_realspace(3), &
-          redshift_realspace(nppix)
-     write(*,'("binned_redshift_realspace: ",f10.6,", ", f10.6, ", ",f10.6," ... ",f10.6)') & 
-          binned_redshift_realspace(1), binned_redshift_realspace(2), &
-          binned_redshift_realspace(3), binned_redshift_realspace(n_binned_realspace)
+     !
+     !write(*, *) 'Rebin (z-space, no pec. vel.)'
+     !write(*,'("redshift_realspace: ",f10.6,", ", f10.6, ", ", f10.6, " ... ", f10.6)') & 
+     !     redshift_realspace(1), redshift_realspace(2), redshift_realspace(3), &
+     !     redshift_realspace(nppix)
+     !write(*,'("binned_redshift_realspace: ",f10.6,", ", f10.6, ", ",f10.6," ... ",f10.6)') & 
+     !     binned_redshift_realspace(1), binned_redshift_realspace(2), &
+     !     binned_redshift_realspace(3), binned_redshift_realspace(n_binned_realspace)
      !
      j = 1
      do i = 1, n_binned_realspace

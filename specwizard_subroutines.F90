@@ -1079,16 +1079,12 @@ subroutine initialize_spectral_parameters
     lambda = minlambda * exp(voverc) 
     !
     if (output_realspacenionweighted_values .or. output_realspacemassweighted_values) then
-      ! marker
-      write(*, '("Set up voverc_realspace: ", I8, " pixels, v/c = ", E12.4)') nppix, vpixsize
+      ! write(*, '("Set up voverc_realspace: ", I8, " pixels, v/c = ", E12.4)') nppix, vpixsize
       do i=1, nppix
         voverc_realspace(i) = dble(i-1) * vpixsize
       enddo
       voverc_realspace = voverc_realspace + log(1.d0 + zabsmin)
-      write(*,*)'No segfaults in setting up voverc_realspace'
       redshift_realspace = exp(voverc_realspace) - 1.d0
-      ! marker
-      write(*,*)'No segfaults in setting up redshift_realspace'
     endif
     !
     !     -------------------
@@ -2651,13 +2647,12 @@ subroutine insertspectra(zcurrent_next)
   maxvoc = min(vocsim(nveloc),log(1.+zqso))
 
   ! debug info real-space values
-  ! marker
-  write(*,*)'Insertspectra inputs real space'
-  write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
-  write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
-          vocsim(1), vocsim(2), vocsim(3), vocsim(nveloc)
-  write(*,'("voverc_realspace: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
-          voverc_realspace(1), voverc_realspace(2), voverc_realspace(3), voverc_realspace(nppix)
+  !write(*,*)'Insertspectra inputs real space'
+  !write(*,'("minvoc: ",f7.4," maxvoc: ", f7.4)') minvoc, maxvoc
+  !write(*,'("vocsim: ",f7.4,", ", f7.4, ", ", f7.4, " ... ", f7.4)') & 
+  !        vocsim(1), vocsim(2), vocsim(3), vocsim(nveloc)
+  !write(*,'("voverc_realspace: ",f7.4,", ", f7.4, ", ",f7.4," ... ",f7.4)') & 
+  !        voverc_realspace(1), voverc_realspace(2), voverc_realspace(3), voverc_realspace(nppix)
                   
   if(output_realspacemassweighted_values)then
      call spline_interpolate(&
