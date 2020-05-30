@@ -1193,6 +1193,7 @@ subroutine get_los_coordinates()
   integer :: file_handle
   !
   integer :: i, nspec_in
+  real(kind=doubleR) :: dummy
   real(kind=doubleR), allocatable :: proj(:)
   !
   if (use_random_los) then 
@@ -1206,7 +1207,7 @@ subroutine get_los_coordinates()
     ! run through the random numbers until we get to where we would be at first_specnum
     if (first_specnum .gt. 1) then
       do i = 1, (first_specnum - 1) * 3
-        random(ran_los)
+        dummy = random(ran_los)
       enddo
     endif
     !
