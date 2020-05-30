@@ -1204,7 +1204,7 @@ subroutine get_los_coordinates()
     ncontribute = 0
     !
     ! run through the random numbers until we get to where we would be at first_specnum
-    if (first_specnum > 1) then
+    if (first_specnum .gt. 1) then
       do i = 1, (first_specnum - 1) * 3
         random(ran_los)
       enddo
