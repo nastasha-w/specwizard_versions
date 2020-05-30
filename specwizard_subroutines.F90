@@ -1188,7 +1188,7 @@ subroutine get_los_coordinates()
   use header
   use my_random_numbers
   use random_numbers, only : ran_los
-  use spectra, only : nspec
+  use spectra, only : nspec, first_specnum
   implicit none
   integer :: file_handle
   !
