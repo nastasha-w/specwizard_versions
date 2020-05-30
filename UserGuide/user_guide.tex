@@ -86,8 +86,10 @@ Note that this default-name parameter file is not present in this repository.
 \paramdescription{If T then we generate a long spectrum by patching together spectra from different redshifts into one composite spectrum (long spectrum mode).  If F then we generate a single spectrum along an individual LOS (short spectrum mode)}
 
 \paramdefinition{nspec}{integer}{}
-\paramdescription{Number of spectra to create.  For short spectra this generates the first {\tt nspec} spectra per LOS file. If there are insufficient sightlines in the LOS file, nspec is reduced. For long spectra this is the total number of long spectra to generate}
+\paramdescription{Number of spectra to create.  For short spectra this generates the first {\tt nspec} spectra per LOS file. If there are insufficient sightlines in the LOS file, nspec is reduced. For long spectra this is the total number of long spectra to generate.}
 
+\paramdefinition{first_specnum}{integer}{}
+\paramdescription{Number of the first spectrum to generate (should be $\geq 1$). This is only used for randomly chosen sightlines. Its usefulness lies in the fact that the specwizard random number generator is seeded based on a (fixed) set of seeds plus the spectrum number. This means that (for long spectra, using the same redshift range, fzresol, etc.) running specwizard with the same parameter file will generate the same spectra. Setting the first spectrum number is then useful to generate additional, different spectra. For short spectra, first_specnum - 1 is used and stored instead.}
 
 \section{Files and Directories}
 

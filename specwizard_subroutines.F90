@@ -120,6 +120,8 @@ contains
           zabsmax = read_real(inline)
         else if (parm == 'nspec') then
           nspec = read_int(inline)
+        else if (parm == 'first_specnum') then
+          first_specnum = read_int(inline)
         else if (parm == 'minlambda') then
           minlambda = read_real(inline)
         else if (parm == 'maxlambda') then
@@ -1200,6 +1202,13 @@ subroutine get_los_coordinates()
     allocate(x_fraction_array(number_of_LOS),y_fraction_array(number_of_LOS),z_fraction_array(number_of_LOS),&
       phi_array(number_of_LOS),theta_array(number_of_LOS),ncontribute(number_of_LOS))
     ncontribute = 0
+    !
+    ! run through the random numbers until we get to where we would be at first_specnum
+    if (first_specnum > 1) then
+      do i = 1, (first_specnum - 1) * 3
+        random(ran_los)
+      enddo
+    endif
     !
     do i = 1, number_of_LOS
       x_fraction_array(i) = random(ran_los)
@@ -2337,7 +2346,7 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
   !
   call hdf5_open_file(file_handle,trim(SpectrumFile))
   !
-  if(ispec == 0) then
+  if(ispec == first_specnum - 1) then
     ! total number of transitions included
     number_of_transitions = sum(nlines)
     allocate(all_ions(number_of_transitions),all_lambda_rest(number_of_transitions),all_fosc(number_of_transitions),&
@@ -2363,13 +2372,16 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
     call hdf5_write_data(file_handle,'Projection/x_fraction_array',x_fraction_array, gzip=16)
     call hdf5_write_data(file_handle,'Projection/y_fraction_array',y_fraction_array, gzip=16)
     call hdf5_write_attribute(file_handle,'Projection/nspec',nspec)
+    if (use_random_los) then
+      call hdf5_write_attribute(file_handle,'Projection/first_specnum',first_specnum - 1)
+    endif
     !
   endif
   !
 !!$  write (*,*) ' MyPE= ',MyPE,' rhocb= ',rhocb
 
   ! Create group for current spectrum
-  call mylabel('/Spectrum',ispec,GroupName)
+  call mylabel('/Spectrum',ispec + first_specnum - 1,GroupName)
   call hdf5_create_group(file_handle, GroupName)
   !
   ! properties of sight line
@@ -3695,6 +3707,9 @@ subroutine write_specwizard_runtime_parameters(file_handle)
     call hdf5_write_attribute(file_handle,trim(GroupName)//'/file_list',file_list)
   endif
   call hdf5_write_attribute(file_handle,trim(GroupName)//'/NumberOfSpectra',nspec)
+  if(use_random_los) then
+    call hdf5_write_attribute(file_handle,trim(GroupName)//'/first_specnum',first_specnum)
+  endif
   if(use_maxdens_above_zmax) then
     call hdf5_write_attribute(file_handle,trim(GroupName)//'/use_maxdens_above_zmax','TRUE')
   else
@@ -3867,6 +3882,7 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   GroupName = 'Header'
   !
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/NumberOfSpectra', nspec)
+  call hdf5_write_attribute(file_handle, trim(GroupName)//'/first_specnum', first_specnum)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Z_min', zabsmin)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Z_max', zabsmax)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Lambda_min', minlambda)

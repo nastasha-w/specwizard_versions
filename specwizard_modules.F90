@@ -394,6 +394,7 @@ module spectra
   real(kind=doubleR) :: fzresol = invalid_R                           ! slack in redshift for short spectra to be included in continuous spectrum
   real(kind=doubleR) :: minlambda = invalid_R, maxlambda  = invalid_R ! Angstrom
   integer(kind=singleI) :: nspec = invalid_I                          ! number of continuous spectra to generate
+  integer(kind=singleI) :: first_specnum = 1
   !
   ! ++++++++++++++++++++++++++++ do_long_spectrum = .true. +++++++++++++++++++++++++++++++++++
   !
