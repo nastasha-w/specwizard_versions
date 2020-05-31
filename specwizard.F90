@@ -115,10 +115,10 @@ program specwizard
   !
   docontspec: if (do_long_spectrum) then
     !
-    do_spectra: do this_spec=first_specnum, first_specnum + nspec, NumPEs
+    do_spectra: do this_spec=first_specnum, first_specnum - 1 + nspec, NumPEs
       ispec = this_spec + MyPE
       ! 
-      good_spectrum: if(ispec .le. first_specnum + nspec)then
+      good_spectrum: if(ispec .le. first_specnum - 1 + nspec)then
         call cpu_timer_start(dospectra)
         !
         call zero_spectra()
@@ -244,7 +244,7 @@ program specwizard
       ! Output spectrum
       !
       do iproc=0, NumPEs-1
-        if(iproc == MyPE .and. ispec .le. first_specnum + nspec)then
+        if(iproc == MyPE .and. ispec .le. first_specnum - 1 + nspec)then
           write (*,*) ' MyPE = ',MyPE,' outputting spectrum = ',ispec
           call write_long_spectrum()
         endif

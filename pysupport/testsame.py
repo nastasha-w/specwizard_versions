@@ -93,8 +93,8 @@ def checksame_arrays(f1, f2, path, name1='file1', name2='file2',\
         if not similar:
             print('{f1} and {f2} do not have similar {aname}'.format(\
               aname=path, **kwfmt))
-            print(a1)
-            print(a2)
+            #print(a1)
+            #print(a2)
     return (identical, similar)
     
 def testsame_shortspectra(filen1, filen2, specnums='all',\
