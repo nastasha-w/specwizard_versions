@@ -335,7 +335,7 @@ def testsame_longspectra(filen1, filen2, specnums='all',\
     dsimilar = True
     
     kwfmt = {'f1': name1, 'f2': name2}
-    kw_allclose = {'rtol': 1e-3}
+    kw_allclose = {}
     kwa = {'name1': name1, 'name2': name2, 'kw_allclose': kw_allclose}
     
     with h5py.File(filen1, 'r') as f1, h5py.File(filen2, 'r') as f2:
