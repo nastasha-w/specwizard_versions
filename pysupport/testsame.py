@@ -299,7 +299,6 @@ def testsame_longspectra(filen1, filen2, specnums='all',\
     sgrps_ion = ['LogTotalIonColumnDensity',\
                  'RedshiftSpaceOpticalDepthOfStrongestTransition']
     sgrps_ionw = ['LOSPeculiarVelocity_KMpS',\
-                  'NIon_CM3',\
                   'OverDensity',\
                   'Temperature_K']
     gen_rsnionw = ['NIon_CM3']
