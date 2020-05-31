@@ -85,14 +85,17 @@ def checksame_arrays(f1, f2, path, name1='file1', name2='file2',\
     
     a1 = np.array(f1[path])
     a2 = np.array(f2[path])
-    n1 = np.isnan(a1)
-    n2 = np.isnan(a2)
-    if np.all(n1 == n2):
-        nsel = np.logical_not(n1)
-    else:
-        print('{f1} and {f2} have differently positioned NaN values in {aname}'.format(\
-              aname=path, **kwfmt))
-        return (False, False)
+    try:
+        n1 = np.isnan(a1)
+        n2 = np.isnan(a2)
+        if np.all(n1 == n2):
+            nsel = np.logical_not(n1)
+        else:
+            print('{f1} and {f2} have differently positioned NaN values in {aname}'.format(\
+                  aname=path, **kwfmt))
+            return (False, False)
+    except TypeError: # e.g. string array -> no NaNs to worry about
+        nsel = ()
     identical = np.all(a1[nsel] == a2[nsel])
     if not identical:
         print('{f1} and {f2} do not have identical {aname}'.format(\
