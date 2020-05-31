@@ -312,9 +312,9 @@ def testsame_longspectra(filen1, filen2, specnums='all',\
                           'x-axis',\
                           'x_simunits',\
                           'y-axis',\
-                          'y-simunits',\
+                          'y_simunits',\
                           'z-axis',\
-                          'z-simunits',\
+                          'z_simunits',\
                           ]
     
     ionw_st = 'RealSpaceNionWeighted'
