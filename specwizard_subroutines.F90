@@ -2788,7 +2788,7 @@ subroutine write_long_spectrum()
   !
   call hdf5_open_file(file_handle,trim(SpectrumFile))
   !
-  if(ispec == 1) then
+  if(ispec == first_specnum) then
      !
      if (output_frequency) then
         ! write wavelengths

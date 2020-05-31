@@ -1,19 +1,19 @@
 \contentsline {chapter}{\numberline {1}How to Run SpecWizard}{3}% 
 \contentsline {chapter}{\numberline {2}Parameters}{4}% 
 \contentsline {section}{\numberline {2.1}Basic Runtime Control}{4}% 
-\contentsline {section}{\numberline {2.2}Files and Directories}{4}% 
+\contentsline {section}{\numberline {2.2}Files and Directories}{5}% 
 \contentsline {section}{\numberline {2.3}Output Control}{6}% 
 \contentsline {section}{\numberline {2.4}Control of Ions}{7}% 
-\contentsline {section}{\numberline {2.5}Metal Abundance Modification}{7}% 
+\contentsline {section}{\numberline {2.5}Metal Abundance Modification}{8}% 
 \contentsline {section}{\numberline {2.6}Noise Statistics}{9}% 
 \contentsline {section}{\numberline {2.7}Accuracy Parameters}{10}% 
 \contentsline {section}{\numberline {2.8}Parameters For Long Spectrum}{11}% 
-\contentsline {chapter}{\numberline {3}Structure of Output Files}{12}% 
-\contentsline {section}{\numberline {3.1}Short Spectra}{12}% 
-\contentsline {section}{\numberline {3.2}Long Spectra}{13}% 
-\contentsline {section}{\numberline {3.3}Normalised Gaussians}{15}% 
-\contentsline {chapter}{\numberline {4}How specwizard works}{17}% 
-\contentsline {section}{\numberline {4.1}Short spectra}{17}% 
-\contentsline {paragraph}{{\tt subroutine projectdata}}{17}% 
-\contentsline {paragraph}{{\tt subroutine makespectra}, {\tt subroutine computespectrum}}{17}% 
-\contentsline {section}{\numberline {4.2}Long spectra}{18}% 
+\contentsline {chapter}{\numberline {3}Structure of Output Files}{13}% 
+\contentsline {section}{\numberline {3.1}Short Spectra}{13}% 
+\contentsline {section}{\numberline {3.2}Long Spectra}{14}% 
+\contentsline {section}{\numberline {3.3}Normalised Gaussians}{16}% 
+\contentsline {chapter}{\numberline {4}How specwizard works}{18}% 
+\contentsline {section}{\numberline {4.1}Short spectra}{18}% 
+\contentsline {paragraph}{{\tt subroutine projectdata}}{18}% 
+\contentsline {paragraph}{{\tt subroutine makespectra}, {\tt subroutine computespectrum}}{18}% 
+\contentsline {section}{\numberline {4.2}Long spectra}{19}% 
