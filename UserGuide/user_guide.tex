@@ -1,5 +1,6 @@
 \documentclass{report}
 \usepackage{fancyhdr}
+\usepackage{hyperref}
 
 %------------------------------- Set style
 \pagestyle{fancy}
@@ -55,6 +56,21 @@
 \pagebreak
 \tableofcontents
 
+\chapter{Installing SpecWizard}
+
+Installing SpecWizard is not entirely straightforward, and depends somewhat on what system you are installing it. However, here are some general instructions and steps that should be helpful. The makefiles, etc., included in this package are for the Cosma system at Durham, though other examples are also included.
+
+\begin{enumerate}
+\item{Choose which C and fortran compilers you want to use (CC and FC in the makefiles, respectively). This should be consistent throughout the process.}
+\item{Load the modules you need, if required on your system: hdf5, compilers (C and fortran90, should include MPI). It's useful to make a note somewhere on which ones you used.}
+\item{Install the hdf5 wrapper SpecWizard needs, available at e.g.\ \url{https://github.com/galtay/sphray/tree/master/hdf5_wrapper}. Installation notes for this package can found found in its README file. One ingredient required here is the path where HDF5 is installed; this needs to be consistent with the hdf5 module you loaded. (You will need to install this if it is not installed already.) You will have to look up this location, or ask someone who knows.}
+\item{Compile the files in the \param{eagle} directory in the SpecWizard package: type `make' in that directory. (Check that the compilers in the Makefile are consistent with the ones in the previous step.)}
+\item{Check the Makefile and make.SYSTEM.COMPILER files: at the top of the Makefile, you need to choose a make.SYSTEM.COMPILER file to use. You will likely need to make your own version of a make.SYSTEM.COMPILER file. This file has a number of lines to pay attention to. First, make sure the fortran compiler FC is consistent with the one used in the \param{eagle} directory and the hdf5 wrapper. Then, you need to provide the information to link the \param{hdf5\_wrapper} compiled files. The lines starting with \param{ISLIB} to \param{HDFW\_LIB} are added to \param{OPTHDFW} and \param{OPTHDF} in the Makefile. Set them so that those lines look like the \param{LINKFLAGS\_HDFW} in \param{/test/Makefile} in the \param{hdf5\_wrapper}.}
+\item{There are some other compile options in the Makefile; not using the MPI version (no \param{-DMPI}) should work fine. I (Nastasha) have only used SpecWizard with the \param{EAGLE} and \param{AliVersion}, and \param{READREGION} options, and the User Guide in its current state assumes those options are used. }
+\item{Compile SpecWizard: type `make' in the specwizard directory.  You may need a few tries for this to work, e.g.\ if the hdf5 linking went wrong, compilers are inconsistent, etc.}
+\item{You will need two more ingredients to actually run SpecWizard: simulation data and ionization tables. EAGLE simulation data is publicly released, although the LOS files used for the long spectra were not included in this release. The ionization tables typically used in EAGLE analysis are not publicly available, but other ionization tables are, and can be put into the format expected by SpecWizard.}
+\end{enumerate}
+
 \chapter{How to Run SpecWizard}
 
 SpecWizard can run in either serial or parallel mode.  To run in serial mode, just run the executable with an optional command line parameter that specifies the parameter filename:
@@ -66,7 +82,7 @@ To run in parallel mode, ensure that the code is compiled with the -DMPI flag se
 {\tt mpirun -np 5 ./specwizard [mypars.par]}
 \linebreak\linebreak
 
-Specwizard has recently been used (and tested) using short spectra with snapshots lines of sight specified in text files, and long spectra using random sightline segments from los files. 
+Specwizard has recently been used (and tested) using short spectra with snapshots lines of sight specified in text files, and long spectra using random sightline segments from LOS files. 
 
 \chapter{Parameters}
 
@@ -74,14 +90,13 @@ By default specwizard looks for an ascii file called {\tt
   specwizard.par} in the current directory and reads parameters from
 there.  If the command line argument is not present then SpecWizard
 searches by default for a parameter file in the current directory
-named {\tt specwizard.par}.  This section contains a complete list and
-description of the parameters.  Where units may be important for a
+named {\tt specwizard.par}.  This section contains a %complete 
+list and description of the parameters.  Where units may be important for a
 parameter they are shown on the right hand side of the page, the
 subscript ${\odot}$ represents solar values.  If any parameters remain
 uninitialized then SpecWizard will crash on startup.  \linebreak
 
-Note that this default-name parameter file is not present in this repository.
-
+Note that this default-name parameter file is not present in this repository. The parameter list is not fully complete. This version of SpecWizard has been tested using EAGLE data only, with short spectra generated from EAGLE snapshots, using specified lists of sightlines, and long spectra using random lines of sight from EAGLE LOS (line of sight) files.
 \section{Basic Runtime Control}
 
 \paramdefinition{do\_long\_spectrum}{logical}{}
@@ -91,12 +106,12 @@ Note that this default-name parameter file is not present in this repository.
 \paramdescription{Number of spectra to create.  For short spectra this generates the first {\tt nspec} spectra per LOS file. If there are insufficient sightlines in the LOS file, nspec is reduced. For long spectra this is the total number of long spectra to generate.}
 
 \paramdefinition{first\_specnum}{integer}{1}
-\paramdescription{Number of the first spectrum to generate (should be $\geq 1$). This is only used for randomly chosen sightlines. Its usefulness lies in the fact that the specwizard random number generator is seeded based on a (fixed) set of seeds plus the spectrum number. This means that (for long spectra, using the same redshift range, fzresol, etc.) running specwizard with the same parameter file will generate the same spectra. Setting the first spectrum number is then useful to generate additional, different spectra. For short spectra, first\_specnum - 1 is used and stored instead.}
+\paramdescription{Number of the first spectrum to generate (should be $\geq 1$). This is only used for randomly chosen sightlines. Its usefulness lies in the fact that the specwizard random number generator is seeded based on a (fixed) set of seeds plus the spectrum number. This means that (for long spectra, using the same redshift range, fzresol, etc.) running specwizard with the same parameter file will generate the same spectra. Setting the first spectrum number is then useful to generate additional, different spectra. For short spectra, \param{first\_specnum} - 1 is used and stored instead, because short spectra are numbered starting at 0, while long spectra start at 1 by default.}
 
 \section{Files and Directories}
 
 \paramdefinition{ibdir}{string}{}
-\paramdescription{Location of HDF5 file containing ionization fractions of each species as a function of redshift, density and temperature}
+\paramdescription{Location of HDF5 file containing ionization fractions of each species as a function of redshift, density and temperature. The ion fractions for e.g. o8 should be contained in a file called o8.hdf5 in this directory.}
 
 \paramdefinition{datadir}{string}{}
 \paramdescription{Location of the data files.  See also \param{file\_list}.
@@ -233,7 +248,7 @@ OR if use\_snapshot\_file is true, this must be the directory containing the sna
 \paramdescription{Accuracy parameter. If true, the line profile is only calculated over the velocity range where the optical depth is above {\tt minbother} divided by the number of pixels. This means that, at most, a total amount of absorption {\tt minbother} is missed in each pixel. (The minbother results still affect the spectra if this is False: they also determine whether the maximum optical depth from a real space pixel is large enough to bother adding to the optical depth spectrum.)}
 
 \paramdefinition{vpixsizekms}{real}{km/s}
-\paramdescription{Pixel size in km/s.  For short spectra this represents the final output pixel size.  For long spectra this represents the pixel size before rebinning into. SpecWizard will stop if this is too small compared with the other parameters. The smaller this number the more accurate the results, but the slower the code will run. Note that this also sets the resolution at which the position-space ion densities and ion-weighted temperatures and peculiar velocities are calculated. The shape and width of the spectral features can therefore be affected if this value is too low.}
+\paramdescription{Pixel size in km/s.  For short spectra this represents the final output pixel size.  For long spectra this represents the pixel size before rebinning into wavelength. SpecWizard will stop if this is too small compared with the other parameters. The smaller this number the more accurate the results, but the slower the code will run. Note that this also sets the resolution at which the position-space ion densities and ion-weighted temperatures and peculiar velocities are calculated. The shape and width of the spectral features can therefore be affected if this value is too low.}
 
 \section{Parameters For Long Spectrum}
 \paramdefinition{zqso}{real}{}
@@ -249,7 +264,7 @@ OR if use\_snapshot\_file is true, this must be the directory containing the sna
 \paramdescription{Minimum allowed absorption redshift}
 
 \paramdefinition{zabsmax}{real}{}
-\paramdescription{Maximum allowed absorption redshift.  If {\tt zabsmax} > {\tt zqso} then {\tt zabsmax} is set equal to {\tt zqso}}
+\paramdescription{Maximum allowed absorption redshift.  If {\tt zabsmax} $>$ {\tt zqso} then {\tt zabsmax} is set equal to {\tt zqso}}
 
 \paramdefinition{nlyman}{integer}{}
 \paramdescription{Number of Lyman lines to include (1 = Ly-alpha, 2 = Ly-beta, etc.; neg. value = use nlyman\_all = 31)}
@@ -425,7 +440,7 @@ Each cell's absorption is modelled as a single Gaussian line. (Damping wings are
 \section{Long spectra}
 To make long spectra, line-of-sight (los) files are needed in the current implementation. These are simulation outputs at smaller time intervals than the Eagle snapshots, containing all particles intersecting a set of 100 lines of sight through the box at each output time. These lines of sight are along the $X$ or $Z$ axis of the simulation, and the axes and positions are randomly chosen. Specwizard chooses lines of sight randomly from all files within some redshift difference $\Delta \, z$ of the end redshift of the last segment \param{zcurrent}, set by the \param{fzresol} parameter.
 
-The lines of sight (files, los numbers, positions, and axes) used are stored in the specwizard output. The positions are in the same units as coordinates in the simulation; for Eagle, that's $\mathrm{cMpc} \, \mathrm{h}^{-1}$.
+The lines of sight (files, LOS numbers, positions, and axes) used are stored in the specwizard output. The positions are in the same units as coordinates in the simulation; for Eagle, that's $\mathrm{cMpc} \, \mathrm{h}^{-1}$.
 
 The short spectra are calculated in the same way as in short spectrum mode, except that the densities are rescaled by the expansion factor at the redshift of the sightline segment (\param{acurrent}/\param{zcurrent}), rather than that of the line-of-sight file or snapshot. The same is true for cosmological calculations, such as local Hubble factors.
 
