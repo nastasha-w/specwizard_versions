@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.10.1)  4 AUG 2020 13:45
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.10.1)  7 AUG 2020 14:47
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -230,41 +230,52 @@ Chapter 2.
 ]
 Chapter 3.
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 100.
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 102.
 [6
 
-] [7] [8] [9] [10] [11] [12] [13] [14]
-Chapter 4.
-[15
+]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 111.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 111.
 
-] [16] [17]
-Overfull \hbox (89.17622pt too wide) in alignment at lines 417--420
+Overfull \hbox (29.03pt too wide) in paragraph at lines 122--122
+\OT1/pcr/m/n/10 <PATH>/L0100N1504/PE/REFERENCE/data/snapshot[]027[]z000p101/\OT
+1/ppl/m/n/10 ).  
+ []
+
+[7] [8] [9] [10] [11] [12] [13] [14] [15] [16] [17]
+Chapter 4.
+[18
+
+] [19] [20]
+Overfull \hbox (89.17622pt too wide) in alignment at lines 496--499
  [][][] []
  []
 
-[18] [19]
+[21] [22]
 Chapter 5.
-[20
+[23
 
-] [21]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 469.
- [22]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 469.
+] [24]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 548.
+ [25]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 548.
  (./user_guide.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 469.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 469.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 548.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 548.
 Package rerunfilecheck Info: File `user_guide.out' has not changed.
-(rerunfilecheck)             Checksum: 399A30E8F1626513FFAD1532D8376235;1111.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 469.
+(rerunfilecheck)             Checksum: 5ED4B88FCDE3A54B25AE29D23840C7D1;1175.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 548.
  ) 
 Here is how much of TeX's memory you used:
- 4525 strings out of 492616
- 67335 string characters out of 6129481
- 159738 words of memory out of 5000000
- 8384 multiletter control sequences out of 15000+600000
- 14582 words of font info for 38 fonts, out of 8000000 for 9000
+ 4550 strings out of 492616
+ 67580 string characters out of 6129481
+ 158738 words of memory out of 5000000
+ 8396 multiletter control sequences out of 15000+600000
+ 19036 words of font info for 49 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 28i,11n,43p,957b,408s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 28i,11n,43p,962b,408s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2019/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/te
 xlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/tex
@@ -279,10 +290,10 @@ f-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2019/texmf-
 dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2019/texmf-dist/fon
 ts/type1/urw/palatino/uplb8a.pfb></usr/local/texlive/2019/texmf-dist/fonts/type
 1/urw/palatino/uplr8a.pfb>
-Output written on user_guide.pdf (22 pages, 192841 bytes).
+Output written on user_guide.pdf (25 pages, 202539 bytes).
 PDF statistics:
- 283 PDF objects out of 1000 (max. 8388607)
- 243 compressed objects within 3 object streams
- 62 named destinations out of 1000 (max. 500000)
- 145 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 304 PDF objects out of 1000 (max. 8388607)
+ 261 compressed objects within 3 object streams
+ 67 named destinations out of 1000 (max. 500000)
+ 153 words of extra memory for PDF output out of 10000 (max. 10000000)
 
