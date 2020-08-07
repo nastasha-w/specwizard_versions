@@ -96,7 +96,9 @@ parameter they are shown on the right hand side of the page, the
 subscript ${\odot}$ represents solar values.  If any parameters remain
 uninitialized then SpecWizard will crash on startup.  \linebreak
 
-Note that this default-name parameter file is not present in this repository. The parameter list is not fully complete. This version of SpecWizard has been tested using EAGLE data only, with short spectra generated from EAGLE snapshots, using specified lists of sightlines, and long spectra using random lines of sight from EAGLE LOS (line of sight) files. I have not used density-metallicity relations (this is unnecessary since EAGLE tracks element abundances), nor the instrument simulation options (noise and gaussian PSF) or the `urchin' options (which are, to the best of my knowledge, not available for EAGLE). 
+Note that this default-name parameter file is not present in this repository. This version of SpecWizard has been tested using EAGLE data only, with short spectra generated from EAGLE snapshots, using specified lists of sightlines, and long spectra using random lines of sight from EAGLE LOS (line of sight) files, and only with specific settings. Basically, the code is tested for some specific cases, but other things that worked earlier may have been broken by updates. This code is useful and has many options, but should not be used as a black box. 
+
+I (Nastasha) have not used density-metallicity relations (this is unnecessary since EAGLE tracks element abundances), the imposed IGM equation of state, the instrument simulation options (noise and gaussian PSF),  the `urchin' options (which are, to the best of my knowledge, not available for EAGLE), tubulence, NoPecVel, or any of the ibfactor options. 
 
 
 \section{Basic Runtime Control}
