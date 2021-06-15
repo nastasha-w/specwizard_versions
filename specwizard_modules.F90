@@ -72,9 +72,11 @@ module atomic_data
   !    Rest wavelength source: Morton 2003, ApJS, 149, 205
   !    Oscillator strength source: Morton 2003, ApJS, 149, 205 (Most UV lines)
   !                                Verner et al 1994, AAPS, 108, 287
-  !                                Verner et al 1996, Atomic Data Nucl. Data Tables, 64, 1 (O8 doublet)
+  !                                Verner et al 1996, Atomic Data Nucl. Data Tables, 64, 1 
+  !                                (C5, C6, N7, O7, O8, Ne9 lines)
+  !                                N6 : consistent with VVF, but more sig. digits from Jelle's list
   !                                List from Jelle Kaastra (current SPEX on 2018-02-06), X-ray lines
-  !
+  !                               
   !    Multiplet transitions should be in order of decreasing osc strength!
   !
   !Physical constants for strength of 21cm emission:
