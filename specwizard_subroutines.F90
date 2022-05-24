@@ -3957,8 +3957,14 @@ subroutine readdata_owls(filename,los_number)
       call hdf5_read_data(file_handle, VarName, Velocity(1:3,NTotal+1:NTotal+NPart_This_sight))
       VarName = trim(LosName)//'/Velocity/h-scale-exponent'
       call hdf5_read_attribute(file_handle,VarName,Vel_h_exp)
+! function reading in EAGLE LOS files: aexp stored as 0.5, should be -1
+! bug in code documenting EAGLE units, discovered by Andr\'es
+#if defined (EAGLE)
+      Vel_aexp_exp = -1.0d0
+#else
       VarName = trim(LosName)//'/Velocity/aexp-scale-exponent'
       call hdf5_read_attribute(file_handle,VarName,Vel_aexp_exp)
+#endif
       VarName = trim(LosName)//'/Velocity/CGSConversionFactor'
       call hdf5_read_attribute(file_handle,VarName,Vel_cgs_unit)
       !
