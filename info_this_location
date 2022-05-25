@@ -1,0 +1,23 @@
+Ion tables on luttero: /data2/specwizard_versions/ionisation_tables_2018_11_07
+
+compiled on quasar (make.quasar)
+main issue seems ot be getting the same compiler as was used for hdf5 and mpi
+modules:
+
+
+used gcc compiler for c
+mpif90 for mpi
+consistency required between compiles in eagle subfolder (read_eagle), specwizard main, and hdf5 wrapper
+
+hdf5 wrapper:
+lots of warnings on compile (looks like type casting + unused variables issues)
+a few similar warnings crop up when compiling read_eagle
+similar long list in specwizard compile
+
+stuff I changed:
+mpiifort -> mpif90
+split some lines that were too long for the compiler
+
+fix for MPI (Tom Theuns, with help):
+get each MPI process to write a separate file, to avoid different processes trying to write to the same file simultaneously.
+(barriers were in use, but the process would reach the barrier before all the writing was actually done.)

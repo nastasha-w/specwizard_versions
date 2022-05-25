@@ -1,0 +1,10 @@
+#!/bin/sh
+numprocesses=16
+logdir="/net/luttero/data2/specwizard_data/sample3_first16_mpi_test/"
+
+out="$logdir""stdout" 
+err="$logdir""stderr" 
+echo "$out"
+echo "$err"
+
+mpirun -n $numprocesses ../specwizard L0100N1504-sample3-first16_test.par > $out 2> $err

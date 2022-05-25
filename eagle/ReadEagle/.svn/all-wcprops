@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/ReadEagle
+END
+test_c.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/ReadEagle/test_c.c
+END
+read_eagle.pro
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/ReadEagle/read_eagle.pro
+END
+_read_eagle.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/ReadEagle/_read_eagle.c
+END
+read_eagle.c
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/ReadEagle/read_eagle.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/ReadEagle/Makefile
+END
+read_eagle_f.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/cosmosim/!svn/ver/532/SpecWizard/src/eagle/ReadEagle/read_eagle_f.c
+END
