@@ -1,4 +1,6 @@
-# compiler options for cosma5
+# compiler options for quasar (leiden strw system)
+# modules:
+# module load mpi (mpif90)
 #
 # FC  # is defined via the loaded module
 FC = mpif90
