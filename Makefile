@@ -1,4 +1,5 @@
-include make.quasar
+include make.cosma5_2018-2.intel
+#include make.quasar
 #include make.cosma5.intel
 #include make.COSMA4.intel
 #include make.ZIJL

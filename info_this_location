@@ -1,3 +1,4 @@
+Leiden (quasar):
 Ion tables on luttero: /data2/specwizard_versions/ionisation_tables_2018_11_07
 
 compiled on quasar (make.quasar)
@@ -21,3 +22,10 @@ split some lines that were too long for the compiler
 fix for MPI (Tom Theuns, with help):
 get each MPI process to write a separate file, to avoid different processes trying to write to the same file simultaneously.
 (barriers were in use, but the process would reach the barrier before all the writing was actually done.)
+
+Cosma (cosma5):
+
+module load intel_comp/2018
+module load mpi
+module load hdf5
+

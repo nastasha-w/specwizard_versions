@@ -1,7 +1,7 @@
 # compiler options for cosma5
 #
 # FC  # is defined via the loaded module
-FC = mpiifort
+FC = mpif90
 
 # define a few sets of flags
 
