@@ -366,6 +366,8 @@ contains
           setmaxt4sfgas = read_logical(inline(first(3):last(3)))
         else if (parm == 'ionfracone') then
           ionfracone = read_logical(inline(first(3):last(3)))
+        else if (parm == 'verbose') then
+          verbose = read_logical(inline(first(3):last(3)))
         else
           write (0,*) ' parameter not recognised: ',inline
           call abortrun(' error reading parameter file ')
