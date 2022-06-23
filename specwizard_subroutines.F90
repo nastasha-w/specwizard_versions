@@ -1194,6 +1194,7 @@ subroutine get_los_coordinates()
   integer :: file_handle
   !
   integer :: i, nspec_in
+  real(kind=doubleR) :: dummy
   real(kind=doubleR), allocatable :: proj(:)
   !
   if (use_random_los) then 
