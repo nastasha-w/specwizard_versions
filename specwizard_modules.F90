@@ -409,7 +409,7 @@ module spectra
     doC2=.false., doC3=.false., doC4=.false., doC5=.false., doC6=.false., &
     doN2= .false., doN3=.false., doN4=.false., doN5=.false., doN6=.false., doN7=.false., &
     doO1=.false., doO3=.false., doO4=.false., doO5=.false., doO6=.false., doO7 = .false., doO8 = .false., &
-    doNe8=.false., doNe9=.false., &
+    doNe8=.false., doNe9=.false., doNe10=.false.,&
     doMg2=.false., &
     doAl2=.false., doAl3=.false., &
     doSi2=.false., doSi3=.false., doSi4 = .false., &
