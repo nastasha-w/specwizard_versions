@@ -373,7 +373,7 @@ module runtime
   logical  :: do_convolve_spectrum = .true.           ! if true, convolve final spectrum with instrumental profile of 'fwhm' km/s
   real(kind=doubleR), parameter :: &                  ! small values
     small_rho = 1.d-30, small_temp=0.1, &             ! small values
-    small_metallicity = 1.d-10, small_column  = 1     ! small values
+    small_metallicity = 1.d-10, small_column  = 1, &  ! small values
     small_velocity = 1.d-10                           ! small values
   !
 end module runtime
