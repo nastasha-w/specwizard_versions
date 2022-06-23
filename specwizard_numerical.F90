@@ -186,6 +186,53 @@ module my_rebin
      enddo
    end subroutine rebin
 
+   subroutine rebin_realspace(input,output)
+      use numbers
+      use spectra, only: redshift_realspace, binned_redshift_realspace, nppix,&
+                         n_binned_realspace, pixsize, maxlambda
+      implicit none
+      real(kind=doubleR), intent(in)  :: input(:)
+      real(kind=doubleR), intent(out) :: output(:)
+    
+      ! local
+      integer :: i,j,k,ninbin
+      real(kind=doubleR) :: pixsize_real
+      !
+      pixsize_real = pixsize / maxlambda
+      !
+      !write(*, *) 'Rebin (z-space, no pec. vel.)'
+      !write(*,'("redshift_realspace: ",f10.6,", ", f10.6, ", ", f10.6, " ... ", f10.6)') & 
+      !     redshift_realspace(1), redshift_realspace(2), redshift_realspace(3), &
+      !     redshift_realspace(nppix)
+      !write(*,'("binned_redshift_realspace: ",f10.6,", ", f10.6, ", ",f10.6," ... ",f10.6)') & 
+      !     binned_redshift_realspace(1), binned_redshift_realspace(2), &
+      !     binned_redshift_realspace(3), binned_redshift_realspace(n_binned_realspace)
+      !
+      j = 1
+      do i = 1, n_binned_realspace
+         ninbin = 0
+         do while (redshift_realspace(j) .lt. binned_redshift_realspace(i)-0.5*pixsize_real &
+                   .and. j .lt. nppix)
+            j = j + 1
+         enddo
+         k = j
+         do while (redshift_realspace(k) .le. binned_redshift_realspace(i)+0.5*pixsize_real &
+                  .and. k .le. nppix)
+            ninbin = ninbin + 1
+            output(i) = output(i) + input(k)
+            k = k + 1
+         enddo
+         if (ninbin .eq. 0) then
+            if (i .lt. nppix) then 
+               write(*,'("ERROR: Grid too coarse! Binned_lambda = ", f10.3)') binned_redshift_realspace(i)
+               stop
+            endif
+         else 
+            output(i) = output(i) / dble(ninbin)
+         endif
+      enddo
+    end subroutine rebin_realspace
+    
 end module my_rebin
 
 

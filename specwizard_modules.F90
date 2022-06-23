@@ -374,6 +374,7 @@ module runtime
   real(kind=doubleR), parameter :: &                  ! small values
     small_rho = 1.d-30, small_temp=0.1, &             ! small values
     small_metallicity = 1.d-10, small_column  = 1     ! small values
+    small_velocity = 1.d-10                           ! small values
   !
 end module runtime
 
@@ -408,7 +409,7 @@ module spectra
     doC2=.false., doC3=.false., doC4=.false., doC5=.false., doC6=.false., &
     doN2= .false., doN3=.false., doN4=.false., doN5=.false., doN6=.false., doN7=.false., &
     doO1=.false., doO3=.false., doO4=.false., doO5=.false., doO6=.false., doO7 = .false., doO8 = .false., &
-    doNe8=.false., doNe9=.false., doNe10=.false.,&
+    doNe8=.false., doNe9=.false., &
     doMg2=.false., &
     doAl2=.false., doAl3=.false., &
     doSi2=.false., doSi3=.false., doSi4 = .false., &
@@ -425,7 +426,7 @@ module spectra
   logical            :: ibfactor_he_reionization = .false.
   !
   ! integration of the spectra
-  logical            :: limsigma = .false.! Only follow profiles until negligible?
+  logical            :: limsigma = .true.! Only follow profiles until negligible?
   !
   real(kind=doubleR) :: pixsize = invalid_R, fwhm = invalid_R ! Pix size in A, FWHM in km/s
   !
@@ -479,38 +480,49 @@ module spectra
   integer(kind=singleI)              :: nsimfile_used
   integer(kind=singleI), parameter   :: max_nsimfile_used = 1000
   integer(kind=singleI), allocatable :: los_used(:)
+  integer(kind=singleI), allocatable :: x_axis_used(:), y_axis_used(:), z_axis_used(:)
   character(len=120), allocatable    :: losfile_used(:)
-  real(kind=doubleR), allocatable    :: x_physical_used(:), y_physical_used(:), ibfactor_used(:), icshift_used(:)
+  real(kind=doubleR), allocatable    :: x_physical_used(:), y_physical_used(:), &
+                                        ibfactor_used(:), icshift_used(:)
   !
   ! spectrum array full spectrum
-  real(kind=doubleR), allocatable    :: lambda(:), voverc(:), tau_long(:,:), flux(:), tau_long_strongest(:,:)   ! size nvpix 
+  real(kind=doubleR), allocatable    :: lambda(:), voverc(:), tau_long(:,:), flux(:), &
+                                        tau_long_strongest(:,:)   ! size nvpix 
+  real(kind=doubleR), allocatable    :: voverc_realspace(:), redshift_realspace(:) ! size nppix 
   !
   ! column density array
   real(kind=doubleR), allocatable    :: cdens_ion_integrated(:)
   !
   ! redshift-space quantities
-  real(kind=doubleR), allocatable    :: temp_z_ion_long(:,:), rho_z_ion_long(:,:) ! size nvpix
+  real(kind=doubleR), allocatable    :: temp_z_ion_long(:,:), rho_z_ion_long(:,:), &
+                                        veloc_z_ion_long(:,:) ! size nvpix
   ! real(kind=doubleR), allocatable    :: temp_z_long(:), rho_z_long(:)
   !
   ! real-space quantities
-  real(kind=doubleR), allocatable    :: temp_ion_long(:,:), n_ion_long(:,:), rho_ion_long(:,:) ! size nvpix
-  real(kind=doubleR), allocatable    :: temp_long(:), rho_long(:), met_long(:)
+  real(kind=doubleR), allocatable    :: temp_ion_long(:,:), n_ion_long(:,:),&
+                                        rho_ion_long(:,:),  veloc_ion_long(:,:) ! size nvpix
+  real(kind=doubleR), allocatable    :: temp_long(:), rho_long(:), met_long(:), veloc_long(:)
   !
   real(kind=doubleR), allocatable    :: flux_convolved(:)  ! size 2*nvpix 
   complex(kind=doubleR), allocatable :: fft(:)
   !
   ! rebinned spectrum
-  integer(kind=singleI) :: n_binned_flux
+  integer(kind=singleI) :: n_binned_flux, n_binned_realspace
   real(kind=doubleR), allocatable    :: binned_lambda(:), binned_flux(:)! size n_binned_spectrum
+  real(kind=doubleR), allocatable    :: binned_redshift_realspace(:)
   real(kind=doubleR), allocatable    :: binned_noise_sigma(:) , binned_noise_random(:)
-  real(kind=doubleR), allocatable    :: binned_temp_z_ion(:,:), binned_rho_z_ion(:,:)
-  real(kind=doubleR), allocatable    :: binned_temp_ion(:,:),binned_n_ion(:,:),binned_rho_ion(:,:)
+  real(kind=doubleR), allocatable    :: binned_temp_z_ion(:,:), binned_rho_z_ion(:,:),&
+                                        binned_veloc_z_ion(:,:) 
+  real(kind=doubleR), allocatable    :: binned_temp_ion(:,:),binned_n_ion(:,:),&
+                                        binned_rho_ion(:,:), binned_veloc_ion(:,:)
+  real(kind=doubleR), allocatable    :: binned_temp(:), binned_rho(:), binned_met(:), binned_veloc(:)
   real(kind=doubleR), allocatable    :: binned_tau_ion(:,:), binned_tau_ion_strongest(:,:)
   integer(kind=singleI), allocatable :: binned_spectrum_boundary(:)
   !
   ! Computed values
   integer(kind=singleI) :: nvpix
   real(kind=doubleR)    :: vpixsize
+  integer(kind=singleI) :: nppix
   !
   integer(kind=singleI) :: icshift
   !
