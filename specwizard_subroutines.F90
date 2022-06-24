@@ -1068,7 +1068,7 @@ subroutine initialize_spectral_parameters
     ! number of pixels for the real space weighted arrays (function of z)
     nppix = log((1.d0 + zabsmax)/(1.d0 + zabsmin))/(1e5*vpixsizekms)*LightSpeed
     !
-    call allocate_spectra_long()  ! size nvpix
+    call allocate_spectra_long()  ! size nvpix or nppix
     !
     vpixsize = vpixsizekms * 1e5 / LightSpeed
     if(MyPE == 0) then
@@ -1080,6 +1080,7 @@ subroutine initialize_spectral_parameters
     do i=1, nvpix
       voverc(i) = dble(i-1) * vpixsize
     enddo
+    !
     lambda = minlambda * exp(voverc) 
     !
     if (output_realspacenionweighted_values .or. output_realspacemassweighted_values) then
@@ -1173,7 +1174,8 @@ subroutine initialize_spectral_parameters
     ! allocate space for info about simulation files used
     allocate(los_used(max_nsimfile_used), icshift_used(max_nsimfile_used), &
       x_physical_used(max_nsimfile_used), y_physical_used(max_nsimfile_used), ibfactor_used(max_nsimfile_used), &
-      losfile_used(max_nsimfile_used))
+      losfile_used(max_nsimfile_used), x_axis_used(max_nsimfile_used), &
+      y_axis_used(max_nsimfile_used), z_axis_used(max_nsimfile_used))
   else
     !
     if(verbose .and. MyPE == 0) then
@@ -1344,16 +1346,19 @@ subroutine create_spectrum_file(ifile)
      endif
   endif
   !
-  ! inquire if output file exists, otherwise stop
-  inquire(file=trim(SpectrumFile),exist=file_exists)
-  if(file_exists .and. .not. overwrite)then
-     write (*,*) 'The required output file ',trim(adjustl(SpectrumFile)),' already exists'
-     write (*,*) 'Please delete this file if you want me to continue'
-     call abortrun('stop')
+  if(MyPE .eq. 0) then
+    ! inquire if output file exists, otherwise stop
+    inquire(file=trim(SpectrumFile),exist=file_exists)
+    if(file_exists .and. .not. overwrite)then
+      write (*,*) 'The required output file ',trim(adjustl(SpectrumFile)),' already exists'
+      write (*,*) 'Please delete this file if you want me to continue'
+      call abortrun('stop')
+    endif
+    !
+    ! create output file
+    call hdf5_create_file(outfile_handle, trim(SpectrumFile))
+    !
   endif
-  !
-  ! create output file
-  call hdf5_create_file(outfile_handle, trim(SpectrumFile))
   !
   ! find and open the first input file 
   if (.not. use_snapshot_file) then
@@ -1385,7 +1390,7 @@ subroutine create_spectrum_file(ifile)
   call hdf5_close_file(infile_handle)
   !
   ! write attribute groups to output file
-  if(MyPE .eq. 0 .or. .not. do_long_spectrum) then
+  if(MyPE .eq. 0) then
     call write_header(outfile_handle)
     call write_units(outfile_handle)
     call write_constants(outfile_handle)
@@ -1411,12 +1416,14 @@ subroutine zero_spectra()
   tau_long_strongest   = 0.d0
   temp_z_ion_long      = 0.d0
   rho_z_ion_long       = 0.d0
+  veloc_z_ion_long     = 0.d0
   temp_ion_long        = 0.d0
   rho_ion_long         = 0.d0
   n_ion_long           = 0.d0
   temp_long            = 0.d0
   rho_long             = 0.d0
   met_long             = 0.d0
+  veloc_long           = 0.d0
   cdens_ion_integrated = 0.d0
   !
 end subroutine zero_spectra
@@ -1765,7 +1772,10 @@ subroutine projectdata()
       if (n_ion(ii,i) .gt. 0.) then 
         veloc_ion(ii,i) = veloc_ion(ii,i) / n_ion(ii,i)
         temp_ion(ii,i)  = temp_ion(ii,i) / n_ion(ii,i)
-        rho_ion(ii,i)   = rho_ion(ii,i) / n_ion(ii,i) ! rho_ion was already cgs
+        ! rho_ion was already cgs -> overdensity (right scaling per output time for long spectra)
+        ! rhocb is at snapshot expansion factor, but densities are rescaled to acurrent 
+        ! -> rescale normalizing rhocb same way
+        rho_ion(ii,i)   = rho_ion(ii,i) / n_ion(ii,i) / (rhocb * densscale)
       endif
       n_ion(ii,i) = n_ion(ii,i) * DensCon ! ions/cm^3
     enddo
@@ -1776,7 +1786,7 @@ subroutine projectdata()
       veloc_tot(i) = veloc_tot(i) / rho_tot(i)
       temp_tot(i)  = temp_tot(i)  / rho_tot(i)
       met_tot(i)   = met_tot(i)   / rho_tot(i)
-      rho_tot(i)   = rho_tot(i) * DensCon ! g/cm^3
+      rho_tot(i)   = rho_tot(i) * DensCon / rhocb ! g/cm^3, -> overdensity (right scaling per output time for long spectra)
     endif
   enddo
   !
@@ -1902,7 +1912,7 @@ subroutine makespectra()
     flux_ion(ion,:)    = exp(-tau(:))
     veloc_z_ion(ion,:) = velocw(:)
     nion_z_ion(ion,:)  = nionw(:)
-    rho_z_ion(ion,:)   = rhow(:)/rhocb ! density in units of mean baryon density
+    rho_z_ion(ion,:)   = rhow(:) ! input density already in units of mean baryon density
     temp_z_ion(ion,:)  = tempw(:)
     !
   enddo
@@ -2430,7 +2440,7 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
       call hdf5_write_data(file_handle, trim(VarName),n_ion(ion,:), gzip=16)
       ! Real space, n_ion.-weighted overdensity
       VarName = trim(ElementGroup)//'OverDensity'
-      call hdf5_write_data(file_handle,trim(VarName),rho_ion(ion,:)/rhocb, gzip=16) !Old version: n_ion(ion,:)*ion_mass(ion)/rhocb
+      call hdf5_write_data(file_handle,trim(VarName),rho_ion(ion,:), gzip=16) !Old version: n_ion(ion,:)*ion_mass(ion)/rhocb
       ! Real space, n_ion-weighted temperature. 
       VarName = trim(ElementGroup)//'Temperature_K'
       call hdf5_write_data(file_handle, trim(VarName),temp_ion(ion,:), gzip=16)
@@ -2444,7 +2454,7 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
     VarName      = trim(MassWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
     call hdf5_write_data(file_handle,trim(varname),veloc_tot, gzip=16)
     VarName      = trim(MassWeightedGroup)//'/OverDensity'
-    call hdf5_write_data(file_handle,trim(varname),rho_tot/rhocb, gzip=16)
+    call hdf5_write_data(file_handle,trim(varname),rho_tot, gzip=16)
     VarName      = trim(MassWeightedGroup)//'/Temperature_K'
     call hdf5_write_data(file_handle,trim(varname),temp_tot, gzip=16)
     !
@@ -2780,7 +2790,9 @@ subroutine write_long_spectrum()
   implicit none
   ! local variables
   integer               :: file_handle, ion, infile_handle
-  character(len=120)    :: outfile, GroupName, ThisSpectrum, VarName, ElementGroup,inputfile
+  character(len=120)    :: outfile, GroupName, ThisSpectrum, VarName, ElementGroup, &
+                           inputfile, IonWeightedGroup, MassWeightedGroup, &
+                           RedshiftIonWeightedGroup
   !
   call hdf5_open_file(file_handle,trim(SpectrumFile))
   !
@@ -2816,18 +2828,63 @@ subroutine write_long_spectrum()
   call hdf5_write_attribute(file_handle,VarName,Seed)
   !
   ! properties of each ion
+  do ion=1,nion
+     ElementGroup = trim(ThisSpectrum)//'/'//trim(ions(ion))
+     call hdf5_create_group(file_handle, ElementGroup)
+     VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthOfStrongestTransition'
+     call hdf5_write_data(file_handle, trim(VarName),binned_tau_ion_strongest(ion,:), gzip=16)
+     VarName = trim(ElementGroup)//'/'//'LogTotalIonColumnDensity'
+     call hdf5_write_data(file_handle, trim(VarName),cdens_ion_integrated(ion))
+  enddo
+  !
   if (output_zspaceopticaldepthweighted_values) then
+     do ion=1,nion
+          ElementGroup = trim(ThisSpectrum)//'/'//trim(ions(ion))
+          RedshiftIonWeightedGroup = trim(ElementGroup)//'/RedshiftSpaceOpticalDepthWeighted'
+          call hdf5_create_group(file_handle, RedshiftIonWeightedGroup)
+          VarName = trim(RedshiftIonWeightedGroup)//'/'//'OverDensity'
+          call hdf5_write_data(file_handle, trim(VarName),binned_rho_z_ion(ion,:), gzip=16)
+          VarName = trim(RedshiftIonWeightedGroup)//'/'//'Temperature_K'
+          call hdf5_write_data(file_handle, trim(VarName),binned_temp_z_ion(ion,:), gzip=16)
+          VarName = trim(RedshiftIonWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
+          call hdf5_write_data(file_handle, trim(VarName),binned_veloc_z_ion(ion,:), gzip=16)
+      enddo
+  endif
+  !
+  if (output_realspacenionweighted_values) then
       do ion=1,nion
           ElementGroup = trim(ThisSpectrum)//'/'//trim(ions(ion))
-          VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthWeightedOverDensity'
-          call hdf5_write_data(file_handle, trim(VarName),binned_rho_z_ion(ion,:), gzip=16)
-          VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthWeightedTemperature_K'
-          call hdf5_write_data(file_handle, trim(VarName),binned_temp_z_ion(ion,:), gzip=16)
-          VarName = trim(ElementGroup)//'/'//'RedshiftSpaceOpticalDepthOfStrongestTransition'
-          call hdf5_write_data(file_handle, trim(VarName),binned_tau_ion_strongest(ion,:), gzip=16)
-          VarName = trim(ElementGroup)//'/'//'LogTotalIonColumnDensity'
-          call hdf5_write_data(file_handle, trim(VarName),cdens_ion_integrated(ion), gzip=16)
+          IonWeightedGroup = trim(ElementGroup)//'/RealSpaceNionWeighted'
+          call hdf5_create_group(file_handle, IonWeightedGroup)
+          VarName = trim(ElementGroup)//'/'//'NIon_CM3'
+          call hdf5_write_data(file_handle, trim(VarName),binned_n_ion(ion,:), gzip=16)
+          VarName = trim(IonWeightedGroup)//'/'//'OverDensity'
+          call hdf5_write_data(file_handle, trim(VarName),binned_rho_ion(ion,:), gzip=16)
+          VarName = trim(IonWeightedGroup)//'/'//'Temperature_K'
+          call hdf5_write_data(file_handle, trim(VarName),binned_temp_ion(ion,:), gzip=16)
+          VarName = trim(IonWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
+          call hdf5_write_data(file_handle, trim(VarName),binned_veloc_ion(ion,:), gzip=16)
       enddo
+  endif
+  ! Mass-weighted properties along the los
+  if (output_realspacemassweighted_values) then
+      MassWeightedGroup = trim(ThisSpectrum)//'/RealSpaceMassWeighted'
+      call hdf5_create_group(file_handle, MassWeightedGroup)
+      VarName      = trim(MassWeightedGroup)//'/LOSPeculiarVelocity_KMpS'
+      call hdf5_write_data(file_handle,trim(varname),binned_veloc, gzip=16)
+      VarName      = trim(MassWeightedGroup)//'/OverDensity'
+      call hdf5_write_data(file_handle,trim(varname),binned_rho, gzip=16)
+      VarName      = trim(MassWeightedGroup)//'/Temperature_K'
+      call hdf5_write_data(file_handle,trim(varname),binned_temp, gzip=16)
+      !
+      ! Metallicity is a mass fraction
+      VarName      = trim(MassWeightedGroup)//'/MetalMassFraction'
+      call hdf5_write_data(file_handle,trim(varname),binned_met, gzip=16)
+  endif
+  !
+  if (output_realspacemassweighted_values .or. output_realspacenionweighted_values) then
+      VarName      = trim(ThisSpectrum)//'/Redshift_RealSpace'
+      call hdf5_write_data(file_handle,trim(varname),binned_redshift_realspace, gzip=16)
   endif
   !
   ! output info of small spectra used
@@ -2838,20 +2895,28 @@ subroutine write_long_spectrum()
   VarName = trim(GroupName)//'/NumberOfShortSpectra'
   call hdf5_write_data(file_handle, trim(VarName), nsimfile_used)
   !
-  if (gimic) then
-     VarName = trim(GroupName)//'/FileUsed'
-     call hdf5_write_data(file_handle,trim(VarName), losfile_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/LosUsed'
-     call hdf5_write_data(file_handle,trim(VarName), los_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/Icshift'
-     call hdf5_write_data(file_handle,trim(VarName), icshift_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/x_physical'
-     call hdf5_write_data(file_handle,trim(VarName), x_physical_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/y_physical'
-     call hdf5_write_data(file_handle,trim(VarName), y_physical_used(1:nsimfile_used))
-     VarName = trim(GroupName)//'/Ibfactor'
-     call hdf5_write_data(file_handle,trim(VarName), ibfactor_used(1:nsimfile_used))
+  !if (gimic) then ! record this for all input files
+  if (.not. use_snapshot_file) then
+      VarName = trim(GroupName)//'/FileUsed'
+      call hdf5_write_data(file_handle,trim(VarName), losfile_used(1:nsimfile_used), gzip=16)
+      VarName = trim(GroupName)//'/LosUsed'
+      call hdf5_write_data(file_handle,trim(VarName), los_used(1:nsimfile_used), gzip=16)
   endif
+  VarName = trim(GroupName)//'/Icshift'
+  call hdf5_write_data(file_handle,trim(VarName), icshift_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/x_simunits'
+  call hdf5_write_data(file_handle,trim(VarName), x_physical_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/y_simunits'
+  call hdf5_write_data(file_handle,trim(VarName), y_physical_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/Ibfactor'
+  call hdf5_write_data(file_handle,trim(VarName), ibfactor_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/x-axis'
+  call hdf5_write_data(file_handle,trim(VarName), x_axis_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/y-axis'
+  call hdf5_write_data(file_handle,trim(VarName), y_axis_used(1:nsimfile_used), gzip=16)
+  VarName = trim(GroupName)//'/z-axis'
+  call hdf5_write_data(file_handle,trim(VarName), z_axis_used(1:nsimfile_used), gzip=16)
+  !endif
   !
   call hdf5_close_file(file_handle)
   !
@@ -3056,7 +3121,7 @@ end subroutine convolve_long_spectrum
 subroutine store_spectrum_info(simfile_used, los_number_used)
   use numbers
   use spectra
-  use projection_parameters, only : x_comoving, y_comoving
+  use projection_parameters, only : x_comoving, y_comoving, x_axis, y_axis, z_axis
   implicit none
   character(*), intent(in)          :: simfile_used
   integer(kind=singleI), intent(in) :: los_number_used
@@ -3071,6 +3136,9 @@ subroutine store_spectrum_info(simfile_used, los_number_used)
      !
      x_physical_used(nsimfile_used)    = x_comoving
      y_physical_used(nsimfile_used)    = y_comoving
+     x_axis_used(nsimfile_used)        = x_axis
+     y_axis_used(nsimfile_used)        = y_axis
+     z_axis_used(nsimfile_used)        = z_axis
      ibfactor_used(nsimfile_used) = ibfactor
   endif
 end subroutine store_spectrum_info
@@ -3774,6 +3842,7 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_rho',small_rho)
   call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_temp',small_temp)
   call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_metallicity',small_metallicity)
+  call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_velocity',small_velocity)
   call hdf5_write_attribute(file_handle,trim(GroupName)//'/small_column',small_column )
   !
   if(modify_metallicity)then
@@ -3834,6 +3903,8 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/PixSizekms_Before_convolution', vpixsizekms)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/nLyman', nLyman)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/ibfactor',ibfactor)
+  call hdf5_write_attribute(file_handle, trim(GroupName)//'/minbother_red', minbother_red)
+  call hdf5_write_attribute(file_handle, trim(GroupName)//'/minbother_blue', minbother_blue)
   if(use_fitted_ibfactor) then
      call hdf5_write_attribute(file_handle, trim(GroupName)//'/use_fitted_ibfactor', 'TRUE')
   else
@@ -3847,7 +3918,7 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   if(limsigma)then
     call hdf5_write_attribute(file_handle,trim(GroupName)//'/limsigma','TRUE')
   else
-   call hdf5_write_attribute(file_handle,trim(GroupName)//'/limsigma','FALSE')
+    call hdf5_write_attribute(file_handle,trim(GroupName)//'/limsigma','FALSE')
   endif
   if(integrate_thermprof_exactly)then
      call hdf5_write_attribute(file_handle, trim(GroupName)//'/Integrate_thermprof_exactly', 'TRUE')
@@ -3867,6 +3938,7 @@ subroutine write_specwizard_runtime_parameters(file_handle)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/SmallRho', Small_Rho)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/SmallTemp', Small_Temp)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Small_metallicity',Small_metallicity )
+  call hdf5_write_attribute(file_handle, trim(GroupName)//'/Small_velocity',Small_velocity )
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Small_column', Small_Column)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Datadir', datadir)
   call hdf5_write_attribute(file_handle, trim(GroupName)//'/Ionization_directory', ibdir)
@@ -3946,7 +4018,8 @@ end subroutine load_noise
 
 subroutine readdata_owls(filename,los_number)
   !
-  ! Read in data of OWLS simulation (hdf5).
+  ! Read in data of OWLS simulation (hdf5): 
+  ! modified -> read EAGLE or OWLS data from LOS files
   !
   use numbers
   use header
@@ -4108,7 +4181,7 @@ subroutine readdata_owls(filename,los_number)
 ! function reading in EAGLE LOS files: aexp stored as 0.5, should be -1
 ! bug in code documenting EAGLE units, discovered by Andr\'es
 #if defined (EAGLE)
-      Vel_aexp_exp = -1.0d0
+      Vel_aexp_exp = -1.0 !single-precision
 #else
       VarName = trim(LosName)//'/Velocity/aexp-scale-exponent'
       call hdf5_read_attribute(file_handle,VarName,Vel_aexp_exp)
@@ -4544,9 +4617,7 @@ subroutine read_full_snapshot()
   snapinfo = open_snapshot(longfile)
   Bsize = BoxSize
   !!call select_region(snapinfo, 0.0, BSize, 0.0, BSize, 0.0, BSize)
-  call select_region(snapinfo, RegionExtentX(1), RegionExtentX(2), &
-                               RegionExtentY(1), RegionExtentY(2), &
-                               RegionExtentZ(1), RegionExtentZ(2))
+  call select_region(snapinfo, RegionExtentX(1), RegionExtentX(2), RegionExtentY(1), RegionExtentY(2), RegionExtentZ(1), RegionExtentZ(2))
   !!  call select_region(snapinfo, 4.0, 5.0, 2.0, 3.0, 3.0, 4.0)
   Ngas = count_particles(snapinfo, 0)
   if(MyPE == 0) then
