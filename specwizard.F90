@@ -140,7 +140,8 @@ program specwizard
           z0 = max(zcurrent - fzresol*(1.+zcurrent)/2.,0.)
           z1 = z0 + fzresol*(1.+zcurrent)
           !
-          if (verbose .and. MyPE == 0) then
+          !if (verbose .and. MyPE == 0) then
+          if (verbose) then
             write(*,'("---------------------------------------")')
             write(*,*) 
             write(*,'("zcurrent, zmin, zmax = ",3(f6.3,x))') zcurrent, z0, z1
@@ -166,7 +167,13 @@ program specwizard
           !
           ! randomly choose sightline
           los_number = int(random(ran_sight)*nlos_in_file(ifile))
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," calling readdata_owls")') MyPE, ispec
+          endif
           call readdata_owls(simfile(ifile),los_number)
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," called readdata_owls")') MyPE, ispec
+          endif
           !
           if(modify_metallicity) call impose_metallicity()
           !
@@ -182,28 +189,56 @@ program specwizard
           ! Number of pixels in this spectrum
           nveloc = int(boxkms / vpixsizekms) + 1
           !
-          if(verbose .and. MyPE == 0)then
+          !if(verbose .and. MyPE == 0)then
+          if (verbose) then
             write(*,'("acurrent:        ",f11.4)')acurrent
             write(*,'("a_sim:           ",f11.4)')ExpansionFactor
             if (.not. use_snapshot_file) write(*,'("los_number:	 ",i11)')los_number
           endif
           !
           ! project SPH data to sightline
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," calling projectdata")') MyPE, ispec
+          endif
           call projectdata()
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," called projectdata")') MyPE, ispec
+          endif
           !
           ! Compute individual spectrum for each ion
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," calling makespectra")') MyPE, ispec
+          endif
           call makespectra()
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," called makespectra")') MyPE, ispec
+          endif
           !
           ! insert in resulting spectrum
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," calling insertspectra")') MyPE, ispec
+          endif
           call cpu_timer_start(doinsert)
           call insertspectra(zcurrent_next)
           call cpu_timer_stop(doinsert)
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," called insertspectra")') MyPE, ispec
+          endif
           !
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," calling store_spectrum_info")') MyPE, ispec
+          endif
           call store_spectrum_info(simfile(ifile), los_number)
+          if (verbose) then
+            write(*,'("process   ",i11,"  ispec ",i11," called store_spectrum_info")') MyPE, ispec
+          endif
           !
           zcurrent = zcurrent_next
           !
         enddo zcurrentloop
+        if (verbose) then
+          write(*,'("process   ",i11,"  ispec ",i11," z loop ended")') MyPE, ispec
+        endif
         !
         ! compute net spectrum
         if(nion == 1)then
@@ -239,6 +274,9 @@ program specwizard
 #ifdef MPI
         call mpi_barrier(mpi_comm_world, ierr)
 #endif
+        if (verbose) then
+           write(*,'("process   ",i11,"  ispec ",i11," done")') MyPE, ispec
+        endif   
       enddo
       !
     enddo do_spectra
