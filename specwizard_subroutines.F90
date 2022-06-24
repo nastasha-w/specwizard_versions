@@ -1175,7 +1175,8 @@ subroutine initialize_spectral_parameters
       y_axis_used(max_nsimfile_used), z_axis_used(max_nsimfile_used))
   else
     !
-    if(verbose .and. MyPE == 0) then
+    !if(verbose .and. MyPE == 0) then
+    if (verbose) then
       write (*,*) ' Program will compute spectra for all sightlines in list'
     endif
   endif dodo_long_spectrum
