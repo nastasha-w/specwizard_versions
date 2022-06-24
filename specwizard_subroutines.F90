@@ -1201,7 +1201,7 @@ subroutine get_los_coordinates()
     !
     number_of_LOS = nspec
     allocate(x_fraction_array(number_of_LOS),y_fraction_array(number_of_LOS),z_fraction_array(number_of_LOS),&
-      phi_array(number_of_LOS),theta_array(number_of_LOS),ncontribute(number_of_LOS))
+      phi_array(number_of_LOS),theta_array(number_of_LOS),ncontribute(number_of_LOS),ncontribute_global(number_of_LOS))
     ncontribute = 0
     !
     ! run through the random numbers until we get to where we would be at first_specnum
