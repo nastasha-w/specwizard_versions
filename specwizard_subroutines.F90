@@ -1348,11 +1348,13 @@ subroutine create_spectrum_file(ifile)
   endif
   !
   ! inquire if output file exists, otherwise stop
-  inquire(file=trim(SpectrumFile),exist=file_exists)
-  if(file_exists .and. .not. overwrite)then
-    write (*,*) 'The required output file ',trim(adjustl(SpectrumFile)),' already exists'
-    write (*,*) 'Please delete this file if you want me to continue'
-    call abortrun('stop')
+  if(MyPE .eq. 0 .or. .not. do_long_spectrum) then
+    inquire(file=trim(SpectrumFile),exist=file_exists)
+    if(file_exists .and. .not. overwrite)then
+      write (*,*) 'The required output file ',trim(adjustl(SpectrumFile)),' already exists'
+      write (*,*) 'Please delete this file if you want me to continue'
+      call abortrun('stop')
+    endif
   endif
   !
   ! create output file
