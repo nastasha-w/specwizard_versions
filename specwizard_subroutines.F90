@@ -1347,19 +1347,16 @@ subroutine create_spectrum_file(ifile)
      endif
   endif
   !
-  if(MyPE .eq. 0) then
-    ! inquire if output file exists, otherwise stop
-    inquire(file=trim(SpectrumFile),exist=file_exists)
-    if(file_exists .and. .not. overwrite)then
-      write (*,*) 'The required output file ',trim(adjustl(SpectrumFile)),' already exists'
-      write (*,*) 'Please delete this file if you want me to continue'
-      call abortrun('stop')
-    endif
-    !
-    ! create output file
-    call hdf5_create_file(outfile_handle, trim(SpectrumFile))
-    !
+  ! inquire if output file exists, otherwise stop
+  inquire(file=trim(SpectrumFile),exist=file_exists)
+  if(file_exists .and. .not. overwrite)then
+    write (*,*) 'The required output file ',trim(adjustl(SpectrumFile)),' already exists'
+    write (*,*) 'Please delete this file if you want me to continue'
+    call abortrun('stop')
   endif
+  !
+  ! create output file
+  call hdf5_create_file(outfile_handle, trim(SpectrumFile))
   !
   ! find and open the first input file 
   if (.not. use_snapshot_file) then
@@ -1391,7 +1388,7 @@ subroutine create_spectrum_file(ifile)
   call hdf5_close_file(infile_handle)
   !
   ! write attribute groups to output file
-  if(MyPE .eq. 0) then
+  if(MyPE .eq. 0 .or. .not. do_long_spectrum) then
     call write_header(outfile_handle)
     call write_units(outfile_handle)
     call write_constants(outfile_handle)
