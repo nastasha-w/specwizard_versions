@@ -24,7 +24,8 @@ module cpu_timers
   implicit none
   !
   integer,parameter  :: ntimers = 20
-  integer, parameter :: main=1, dospectra=2, doinsert=3, dointerpolate=4
+  integer, parameter :: main=1, dospectra=2, doinsert=3, dointerpolate=4, &
+                        doprojecteach=5, domakespectraeach=6
   real(kind=doubleR) :: cputime(ntimers), cpustart(ntimers), cpustop(ntimers)
   logical            :: cpu_is_running(ntimers)
   !
@@ -71,9 +72,11 @@ module atomic_data
   !    Rest wavelength source: Morton 2003, ApJS, 149, 205
   !    Oscillator strength source: Morton 2003, ApJS, 149, 205 (Most UV lines)
   !                                Verner et al 1994, AAPS, 108, 287
-  !                                Verner et al 1996, Atomic Data Nucl. Data Tables, 64, 1 (O8 doublet)
+  !                                Verner et al 1996, Atomic Data Nucl. Data Tables, 64, 1 
+  !                                (C5, C6, N7, O7, O8, Ne9 lines)
+  !                                N6 : consistent with VVF, but more sig. digits from Jelle's list
   !                                List from Jelle Kaastra (current SPEX on 2018-02-06), X-ray lines
-  !
+  !                               
   !    Multiplet transitions should be in order of decreasing osc strength!
   !
   !Physical constants for strength of 21cm emission:
@@ -373,7 +376,8 @@ module runtime
   logical  :: do_convolve_spectrum = .true.           ! if true, convolve final spectrum with instrumental profile of 'fwhm' km/s
   real(kind=doubleR), parameter :: &                  ! small values
     small_rho = 1.d-30, small_temp=0.1, &             ! small values
-    small_metallicity = 1.d-10, small_column  = 1     ! small values
+    small_metallicity = 1.d-10, small_column  = 1, &  ! small values
+    small_velocity = 1.d-10                           ! small values
   !
 end module runtime
 
@@ -395,6 +399,7 @@ module spectra
   real(kind=doubleR) :: fzresol = invalid_R                           ! slack in redshift for short spectra to be included in continuous spectrum
   real(kind=doubleR) :: minlambda = invalid_R, maxlambda  = invalid_R ! Angstrom
   integer(kind=singleI) :: nspec = invalid_I                          ! number of continuous spectra to generate
+  integer(kind=singleI) :: first_specnum = 1
   !
   ! ++++++++++++++++++++++++++++ do_long_spectrum = .true. +++++++++++++++++++++++++++++++++++
   !
@@ -424,7 +429,7 @@ module spectra
   logical            :: ibfactor_he_reionization = .false.
   !
   ! integration of the spectra
-  logical            :: limsigma = .false.! Only follow profiles until negligible?
+  logical            :: limsigma = .true.! Only follow profiles until negligible?
   !
   real(kind=doubleR) :: pixsize = invalid_R, fwhm = invalid_R ! Pix size in A, FWHM in km/s
   !
@@ -478,38 +483,49 @@ module spectra
   integer(kind=singleI)              :: nsimfile_used
   integer(kind=singleI), parameter   :: max_nsimfile_used = 1000
   integer(kind=singleI), allocatable :: los_used(:)
+  integer(kind=singleI), allocatable :: x_axis_used(:), y_axis_used(:), z_axis_used(:)
   character(len=120), allocatable    :: losfile_used(:)
-  real(kind=doubleR), allocatable    :: x_physical_used(:), y_physical_used(:), ibfactor_used(:), icshift_used(:)
+  real(kind=doubleR), allocatable    :: x_physical_used(:), y_physical_used(:), &
+                                        ibfactor_used(:), icshift_used(:)
   !
   ! spectrum array full spectrum
-  real(kind=doubleR), allocatable    :: lambda(:), voverc(:), tau_long(:,:), flux(:), tau_long_strongest(:,:)   ! size nvpix 
+  real(kind=doubleR), allocatable    :: lambda(:), voverc(:), tau_long(:,:), flux(:), &
+                                        tau_long_strongest(:,:)   ! size nvpix 
+  real(kind=doubleR), allocatable    :: voverc_realspace(:), redshift_realspace(:) ! size nppix 
   !
   ! column density array
   real(kind=doubleR), allocatable    :: cdens_ion_integrated(:)
   !
   ! redshift-space quantities
-  real(kind=doubleR), allocatable    :: temp_z_ion_long(:,:), rho_z_ion_long(:,:) ! size nvpix
+  real(kind=doubleR), allocatable    :: temp_z_ion_long(:,:), rho_z_ion_long(:,:), &
+                                        veloc_z_ion_long(:,:) ! size nvpix
   ! real(kind=doubleR), allocatable    :: temp_z_long(:), rho_z_long(:)
   !
   ! real-space quantities
-  real(kind=doubleR), allocatable    :: temp_ion_long(:,:), n_ion_long(:,:), rho_ion_long(:,:) ! size nvpix
-  real(kind=doubleR), allocatable    :: temp_long(:), rho_long(:), met_long(:)
+  real(kind=doubleR), allocatable    :: temp_ion_long(:,:), n_ion_long(:,:),&
+                                        rho_ion_long(:,:),  veloc_ion_long(:,:) ! size nvpix
+  real(kind=doubleR), allocatable    :: temp_long(:), rho_long(:), met_long(:), veloc_long(:)
   !
   real(kind=doubleR), allocatable    :: flux_convolved(:)  ! size 2*nvpix 
   complex(kind=doubleR), allocatable :: fft(:)
   !
   ! rebinned spectrum
-  integer(kind=singleI) :: n_binned_flux
+  integer(kind=singleI) :: n_binned_flux, n_binned_realspace
   real(kind=doubleR), allocatable    :: binned_lambda(:), binned_flux(:)! size n_binned_spectrum
+  real(kind=doubleR), allocatable    :: binned_redshift_realspace(:)
   real(kind=doubleR), allocatable    :: binned_noise_sigma(:) , binned_noise_random(:)
-  real(kind=doubleR), allocatable    :: binned_temp_z_ion(:,:), binned_rho_z_ion(:,:)
-  real(kind=doubleR), allocatable    :: binned_temp_ion(:,:),binned_n_ion(:,:),binned_rho_ion(:,:)
+  real(kind=doubleR), allocatable    :: binned_temp_z_ion(:,:), binned_rho_z_ion(:,:),&
+                                        binned_veloc_z_ion(:,:) 
+  real(kind=doubleR), allocatable    :: binned_temp_ion(:,:),binned_n_ion(:,:),&
+                                        binned_rho_ion(:,:), binned_veloc_ion(:,:)
+  real(kind=doubleR), allocatable    :: binned_temp(:), binned_rho(:), binned_met(:), binned_veloc(:)
   real(kind=doubleR), allocatable    :: binned_tau_ion(:,:), binned_tau_ion_strongest(:,:)
   integer(kind=singleI), allocatable :: binned_spectrum_boundary(:)
   !
   ! Computed values
   integer(kind=singleI) :: nvpix
   real(kind=doubleR)    :: vpixsize
+  integer(kind=singleI) :: nppix
   !
   integer(kind=singleI) :: icshift
   !
@@ -627,14 +643,21 @@ module particledata
   !
 #ifdef EAGLE
   real(kind=doubleR), allocatable :: Position(:,:)
-#else
-  real(kind=singleR), allocatable :: Position(:,:)
-#endif
-  real(kind=singleR), allocatable :: Velocity(:,:)!!!, ShiftedPosition(:,:), ShiftedVelocity(:,:)
-  real(kind=singleR), allocatable:: Mass(:),ParticleDensity(:),&
-    ParticleSmoothingLength(:),ParticleTemperature(:),Metallicity(:), MassFractions(:,:),  &
+  real(kind=doubleR), allocatable :: Velocity(:,:)!!!, ShiftedPosition(:,:), ShiftedVelocity(:,:)
+  real(kind=doubleR), allocatable:: Mass(:),ParticleDensity(:),&
+    ParticleSmoothingLength(:),ParticleTemperature(:), Metallicity(:), & 
+    MassFractions(:,:),  &
     MetallicityInSolar(:), Zmetal(:), Zrelat(:), StarFormationRate(:),&
     ParticleNeutralHFraction(:),ParticleMolecularHFraction(:)
+#else
+  real(kind=singleR), allocatable :: Position(:,:)
+  real(kind=singleR), allocatable :: Velocity(:,:)!!!, ShiftedPosition(:,:), ShiftedVelocity(:,:)
+  real(kind=singleR), allocatable:: Mass(:),ParticleDensity(:),&
+    ParticleSmoothingLength(:),ParticleTemperature(:),Metallicity(:), &
+    MassFractions(:,:),  &
+    MetallicityInSolar(:), Zmetal(:), Zrelat(:), StarFormationRate(:),&
+    ParticleNeutralHFraction(:),ParticleMolecularHFraction(:)
+#endif
   integer(kind=singleI), allocatable ::  Boundary(:)
   integer(kind=singleI), allocatable :: itype(:)
   !
