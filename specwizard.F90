@@ -425,6 +425,9 @@ program specwizard
       call mpi_barrier(mpi_comm_world, ierr)
 #endif
       call update_short_spectrum(simfile(ifile), numspec)
+#ifdef MPI
+      call mpi_barrier(mpi_comm_world, ierr)
+#endif
     enddo files_loop
     !
   endif docontspec
