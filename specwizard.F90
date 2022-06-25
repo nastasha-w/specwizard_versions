@@ -53,6 +53,7 @@ program specwizard
   real(kind=doubleR)    :: z0, z1, CurrentHubbleCt, zcurrent_next
   integer(kind=singleI) :: this_spec, nargs, numspec, n1d
   real(kind=doubleR)    :: extent
+  character(len=3)      :: numfile
   !
 #ifdef MPI
   call mpi_init(ierr)
