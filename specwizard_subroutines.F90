@@ -226,6 +226,8 @@ contains
           doNe8 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doNe9') then
           doNe9 = read_logical(inline(first(3):last(3)))
+        else if (parm == 'doNe10') then
+          doNe10 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doSi2') then
           doSi2 = read_logical(inline(first(3):last(3)))
         else if (parm == 'doSi3') then
@@ -279,6 +281,7 @@ contains
             doAl3  =.true.
             doNe8  =.true.
             doNe9  =.true.
+            doNe10 =.true.
             doSi2  =.true.
             doSi3  =.true.
             doSi4  =.true.
@@ -5436,6 +5439,10 @@ subroutine initialize_ionization_tables
      nion = nion + 1
      requireNe = .true.
   endif
+  if (doNe10) then 
+    nion = nion + 1
+    requireNe = .true.
+  endif
   if (doAl2) then 
      nion = nion + 1
      requireAl = .true.
@@ -5903,6 +5910,17 @@ subroutine initialize_ionization_tables
     do i = 1, nlines(ii)
       lambda_rest(ii,i) = Lambda_Ne9(i)
       fosc(ii,i) = f_Ne9(i)
+    enddo
+  endif
+  if (doNe10) then
+    ii = ii + 1
+    ions(ii) = 'ne10'
+    ion_mass(ii) = massNe
+    ion_elnr(ii) = Ne_index
+    nlines(ii) = 2
+    do i = 1, nlines(ii)
+      lambda_rest(ii,i) = Lambda_Ne10(i)
+      fosc(ii,i) = f_Ne10(i)
     enddo
   endif
   if (doFe2) then
