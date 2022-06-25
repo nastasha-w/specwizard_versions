@@ -410,19 +410,14 @@ program specwizard
         endif
         !
         ! Output Spectra
-        do iproc=0, numpes-1
-           SpectrumFile = trim(outputdir)//'/spec.'//simfile(ifile)
-           if(iproc == MyPE) then
-              if(MyPE == 0 .and. los_number == 0) &
-                   call create_spectrum_file(ifile)
-              call write_short_spectrum(simfile(ifile), los_number, numspec)
-           endif
-           !
-#ifdef MPI
-           call mpi_barrier(mpi_comm_world, ierr)
-#endif  
-           !
-        enddo
+        write (numfile,'(I3.3)') MyPE
+        SpectrumFile = trim(outputdir)//'/spec.'//numfile//'.'//simfile(ifile)
+        write (*,*) ' mype = ',mype,' file= ',spectrumfile,los_number
+        if(MyPE .eq. los_number) then
+           write (*,*) ' mype = ',mype,' creating file= ',spectrumfile,los_number
+           call create_spectrum_file(ifile)
+        endif
+        call write_short_spectrum(simfile(ifile), los_number, numspec)
         !
       enddo los_loop
 #ifdef MPI
