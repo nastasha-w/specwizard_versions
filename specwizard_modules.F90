@@ -191,6 +191,9 @@ module atomic_data
   real(kind=doubleR) :: Lambda_Ne9(1), f_Ne9(1)
   data Lambda_Ne9 / 13.4471 /
   data f_Ne9 / 0.724 /
+  real(kind=doubleR) :: Lambda_Ne10(2), f_Ne10(2)
+  data Lambda_Ne10 / 12.1321, 12.1375/
+  data f_Ne10 / 0.277,  0.139/
   !
   ! Mg
   real(kind=doubleR), parameter :: massMg = 24.3050 * atom_munit
@@ -409,7 +412,7 @@ module spectra
     doC2=.false., doC3=.false., doC4=.false., doC5=.false., doC6=.false., &
     doN2= .false., doN3=.false., doN4=.false., doN5=.false., doN6=.false., doN7=.false., &
     doO1=.false., doO3=.false., doO4=.false., doO5=.false., doO6=.false., doO7 = .false., doO8 = .false., &
-    doNe8=.false., doNe9=.false., &
+    doNe8=.false., doNe9=.false., doNe10=.false., &
     doMg2=.false., &
     doAl2=.false., doAl3=.false., &
     doSi2=.false., doSi3=.false., doSi4 = .false., &
