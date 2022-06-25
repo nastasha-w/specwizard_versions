@@ -248,7 +248,8 @@ program specwizard
         if(iproc == MyPE .and. ispec .le. first_specnum - 1 + nspec)then
           write (*,*) ' MyPE = ',MyPE,' outputting spectrum = ',ispec
           call write_long_spectrum()
-          write (*,*) ' MyPE = ',MyPE,' outputting spectrum finished write_long_spectrum call'
+          call sleep(2) ! debug, check if overlapping writes are causing trouble
+          write (*,*) ' MyPE = ',MyPE,' finished write_long_spectrum call'
         endif
 #ifdef MPI
         call mpi_barrier(mpi_comm_world, ierr)
