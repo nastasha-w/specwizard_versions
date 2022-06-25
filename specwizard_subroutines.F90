@@ -2789,6 +2789,7 @@ subroutine write_long_spectrum()
                            inputfile, IonWeightedGroup, MassWeightedGroup, &
                            RedshiftIonWeightedGroup
   !
+  write (*,*) 'write_long_spectrum writing to file ', SpectrumFile
   call hdf5_open_file(file_handle,trim(SpectrumFile))
   !
   if(ispec == first_specnum) then
@@ -2806,6 +2807,7 @@ subroutine write_long_spectrum()
   ! write current spectrum
   call mylabel('/Spectrum',ispec,ThisSpectrum)
   call hdf5_create_group(file_handle, ThisSpectrum)
+  write (*,*) 'write_long_spectrum writing to hdf5 group ', ThisSpectrum, ' for index ', ispec
   !
   VarName = trim(ThisSpectrum)//'/Flux'
   call hdf5_write_data(file_handle, trim(VarName), binned_flux, gzip=16)
