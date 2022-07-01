@@ -9,7 +9,14 @@ Created on Wed Apr 29 16:09:21 2020
 import numpy as np
 import h5py
 
-def checksame_attrs(group1, group2, name1='group1', name2='group2'):
+def decodeif(x):
+    if isinstance(x, type(b'')):
+        out = x.decode()
+    else:
+        out = x
+    return out
+
+def checksame_attrs(group1, group2, name1='group1', name2='group2',):
     '''
     Check if the attributes of hdf5 two groups match exactly
     the exact differences are printed, but not returned
@@ -29,8 +36,8 @@ def checksame_attrs(group1, group2, name1='group1', name2='group2'):
     allsame = True
     kwfmt = {'g1': name1, 'g2': name2}
     
-    attrs1 = {key: val for key, val in group1.attrs.items()}
-    attrs2 = {key: val for key, val in group2.attrs.items()}
+    attrs1 = {key: decodeif(val) for key, val in group1.attrs.items()}
+    attrs2 = {key: decodeif(val) for key, val in group2.attrs.items()}
     
     keys1 = set(attrs1.keys())
     keys2 = set(attrs2.keys())
@@ -109,20 +116,30 @@ def checksame_arrays(f1, f2, path, name1='file1', name2='file2',\
     return (identical, similar)
     
 def testsame_shortspectra(filen1, filen2, specnums='all',\
-                          name1='file1', name2='file2'):
+                          name1='file1', name2='file2',
+                          ignore_projection=False):
     '''
     test if the specwizard outputs file1 and file2 are the same (for the 
     selected spectra) 
     useful to check if debugging had unwanted/unexpected side effects
     
-    input:
-    ------
-    filen1:   name of the first hdf5 output file
-    filen2:   name of the second hdf5 output file
-    specnums: list-like of integers or 'all'; which spectrum numbers to compare
-              number are assumed to match between the files
-    name1:    name for the first file (used in reporting differences)
-    name2:    name for the second file (used in reporting differences)
+    Parameters:
+    -----------
+    filen1: str  
+        name of the first hdf5 output file
+    filen2: str   
+        name of the second hdf5 output file
+    specnums: list-like of integers or 'all'
+        which spectrum numbers to compare. Numbers are assumed to match 
+        between the files.
+    name1: str   
+        name for the first file (used in reporting differences)
+    name2: str
+        name for the second file (used in reporting differences)
+    ignore_projection: bool
+        ignore the 'Projection' group in the comparision. Useful in 
+        quasar-style split-file outputs, where this data is only stored
+        in the first file.
     
     returns:
     --------
@@ -131,28 +148,32 @@ def testsame_shortspectra(filen1, filen2, specnums='all',\
     more detailed differences are printed
     '''
     
-    checkpaths_attrs = ['Constants',\
-                        'Header',\
-                        'Header/ModifyMetallicityParameters',\
-                        'Parameters/ChemicalElements',\
-                        'Parameters/SpecWizardRuntimeParameters',\
-                        'Projection',\
+    checkpaths_attrs = ['Constants',
+                        'Header',
+                        'Header/ModifyMetallicityParameters',
+                        'Parameters/ChemicalElements',
+                        'Parameters/SpecWizardRuntimeParameters',
+                        'Projection',
                         'Units']
-    checksame_arns_sn = ['Projection/ncontr',\
-                           'Projection/x_fraction_array',\
-                           'Projection/y_fraction_array']
+    checksame_arns_sn = ['Projection/ncontr',
+                         'Projection/x_fraction_array',
+                         'Projection/y_fraction_array']
     checksame_arns = ['VHubble_KMpS']
+
+    if ignore_projection:
+        checksame_arns_sn = []
+        checkpaths_attrs.remove('Projection')
     
-    sgrps_mass = ['LOSPeculiarVelocity_KMpS',\
-                  'MetalMassFraction',\
-                  'OverDensity',\
+    sgrps_mass = ['LOSPeculiarVelocity_KMpS',
+                  'MetalMassFraction',
+                  'OverDensity',
                   'Temperature_K']
-    sgrps_ion = ['Flux',\
-                 'LogTotalIonColumnDensity',\
+    sgrps_ion = ['Flux',
+                 'LogTotalIonColumnDensity',
                  'OpticalDepth']
-    sgrps_ionw = ['LOSPeculiarVelocity_KMpS',\
-                  'NIon_CM3',\
-                  'OverDensity',\
+    sgrps_ionw = ['LOSPeculiarVelocity_KMpS',
+                  'NIon_CM3',
+                  'OverDensity',
                   'Temperature_K']
     ionw_st = 'RealSpaceNionWeighted'
     tauw_st = 'RedshiftSpaceOpticalDepthWeighted'

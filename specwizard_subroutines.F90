@@ -2349,7 +2349,8 @@ subroutine write_short_spectrum(particlefile, los_number, nlos)
   !
   call hdf5_open_file(file_handle,trim(SpectrumFile))
   !
-  if(ispec == first_specnum - 1) then
+  ! once for each output file (old: ispec == first_specnum - 1)
+  if (ispec + 1 - first_specnum == myPE) then
     ! total number of transitions included
     number_of_transitions = sum(nlines)
     allocate(all_ions(number_of_transitions),all_lambda_rest(number_of_transitions),all_fosc(number_of_transitions),&
