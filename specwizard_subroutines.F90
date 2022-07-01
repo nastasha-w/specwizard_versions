@@ -2300,13 +2300,16 @@ subroutine update_short_spectrum(particlefile, nlos)
   ! calculate number of particles that contributed to each sight line
 
 #ifdef MPI
-  call mpi_reduce(ncontribute, ncontribute_global, nlos, MPI_INTEGER, MPI_SUM, 0, MPI_COMM_WORLD, MPI_err)
+  !store in each ouput file -> each one needs the output
+  !short spectra processes are all held up for this function call anyway  
+  !call mpi_reduce(ncontribute, ncontribute_global, nlos, MPI_INTEGER, MPI_SUM, 0, MPI_COMM_WORLD, MPI_err)
+  call mpi_allreduce(ncontribute, ncontribute_global, nlos, MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD, MPI_err)   
 #else
   ncontribute_global = ncontribute 
 #endif
   
   ! check for existence of output file
-  if(MyPE == 0) then
+  if(ispec + 1 - first_specnum == myPE) then
      inquire(file=SpectrumFile,exist=file_exists)
      if(.not. file_exists)then
         call abortrun('The required output file '//trim(SpectrumFile)//' does not exist')
