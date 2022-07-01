@@ -249,7 +249,7 @@ program specwizard
           write (*,*) ' MyPE = ',MyPE,' outputting spectrum = ',ispec
           call write_long_spectrum()
           !call sleep(2) ! debug, check if overlapping writes are causing trouble
-          write (*,*) ' MyPE = ',MyPE,' finished write_long_spectrum call'
+          !write (*,*) ' MyPE = ',MyPE,' finished write_long_spectrum call'
         endif
 #ifdef MPI
         call mpi_barrier(mpi_comm_world, ierr)
