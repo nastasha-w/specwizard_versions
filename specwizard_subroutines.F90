@@ -2304,24 +2304,24 @@ subroutine update_short_spectrum(particlefile, nlos)
   !short spectra processes are all held up for this function call anyway  
   !call mpi_reduce(ncontribute, ncontribute_global, nlos, MPI_INTEGER, MPI_SUM, 0, MPI_COMM_WORLD, MPI_err)
   call mpi_allreduce(ncontribute, ncontribute_global, nlos, MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD, MPI_err)   
-  write(*, *) 'Process ', MyPE, ' seeing first ncontribute_global elt', ncontribute_global(1)
-  write(*, *) 'Process ', MyPE, ' ispec', ispec, 'ispec + 1 - first_specnum', ispec + 1 - first_specnum
+  !write(*, *) 'Process ', MyPE, ' seeing first ncontribute_global elt', ncontribute_global(1)
+  !write(*, *) 'Process ', MyPE, ' ispec', ispec, 'ispec + 1 - first_specnum', ispec + 1 - first_specnum
 #else
   ncontribute_global = ncontribute 
 #endif
   
   ! check for existence of output file
-  if(ispec + 1 - first_specnum .eq. myPE) then
-     inquire(file=SpectrumFile,exist=file_exists)
-     if(.not. file_exists)then
-        call abortrun('The required output file '//trim(SpectrumFile)//' does not exist')
-     endif
-     !
-     write(*, *) 'MyPE ', MyPE, ' attempting to save ncontr'  
-     call hdf5_open_file(file_handle,trim(SpectrumFile))
-     call hdf5_write_data(file_handle,'Projection/ncontr', ncontribute_global)
-     call hdf5_close_file(file_handle)
+  !if(MyPE == 0) then
+  ! for each process/output file
+  inquire(file=SpectrumFile,exist=file_exists)
+  if(.not. file_exists)then
+    call abortrun('The required output file '//trim(SpectrumFile)//' does not exist')
   endif
+  !
+  !write(*, *) 'MyPE ', MyPE, ' attempting to save ncontr'  
+  call hdf5_open_file(file_handle,trim(SpectrumFile))
+  call hdf5_write_data(file_handle,'Projection/ncontr', ncontribute_global)
+  call hdf5_close_file(file_handle)
 end subroutine update_short_spectrum
 
 subroutine write_short_spectrum(particlefile, los_number, nlos)
