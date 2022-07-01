@@ -37,7 +37,7 @@ def test_snapshots():
         fln = 'snap_z0_new'
         same = ts.testsame_shortspectra(fno, fnn, specnums=sls, 
                                         name1=flo, name2=fln,
-                                        ignore_projection=first != 0)
+                                        ignore_projection=False)
         print('Match {} for z0 spectra, file {}'.format(same, first))
         allsame_z0 &= same
 
@@ -47,7 +47,7 @@ def test_snapshots():
         fln = 'snap_z3_new'
         same = ts.testsame_shortspectra(fno, fnn, specnums=sls, 
                                         name1=flo, name2=fln,
-                                        ignore_projection=first != 0)
+                                        ignore_projection=False)
         print('Match {} for z3 spectra, file {}'.format(same, first))
         allsame_z3 &= same
     print('All same for z0: {}'.format(allsame_z0))
