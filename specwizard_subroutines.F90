@@ -1355,10 +1355,9 @@ subroutine create_spectrum_file(ifile)
       write (*,*) 'Please delete this file if you want me to continue'
       call abortrun('stop')
     endif
+    ! create output file
+    call hdf5_create_file(outfile_handle, trim(SpectrumFile))
   endif
-  !
-  ! create output file
-  call hdf5_create_file(outfile_handle, trim(SpectrumFile))
   !
   ! find and open the first input file 
   if (.not. use_snapshot_file) then
