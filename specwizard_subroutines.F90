@@ -2306,7 +2306,7 @@ subroutine update_short_spectrum(particlefile, nlos)
   call mpi_allreduce(ncontribute, ncontribute_global, nlos, MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD, MPI_err)   
   write(*, *) 'Process ', MyPE, ' seeing first ncontribute_global elt', ncontribute_global(1)
   write(*, *) 'Process ', MyPE, ' ispec', ispec, 'ispec + 1 - first_specnum', ispec + 1 - first_specnum
-  #else
+#else
   ncontribute_global = ncontribute 
 #endif
   
