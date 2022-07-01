@@ -417,7 +417,7 @@ program specwizard
         SpectrumFile = trim(outputdir)//'/spec.'//numfile//'.'//simfile(ifile)
         write (*,*) ' mype = ',mype,' file= ',spectrumfile,los_number
         if(MyPE .eq. los_number) then
-           write (*,*) ' mype = ',mype,' creating file= ',spectrumfile,los_number
+           !write (*,*) ' mype = ',mype,' creating file= ',spectrumfile,los_number
            call create_spectrum_file(ifile)
         endif
         call write_short_spectrum(simfile(ifile), los_number, numspec)
