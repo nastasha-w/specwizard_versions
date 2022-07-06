@@ -65,6 +65,56 @@ def checksame_attrs(group1, group2, name1='group1', name2='group2',):
                   key=key, at1=attrs1[key], at2=attrs2[key], **kwfmt))
     return allsame
 
+def checkdiff_attrs(group1, group2, name1='group1', name2='group2',):
+    '''
+    Check if the attributes of hdf5 two groups all differ
+    the exact differences are printed, but not returned
+    
+    input:
+    ------
+    group1: first hdf5 group
+    group2: second hdf5 group
+    name1:  name for the first hdf5 group (str; used in printing differences)
+    name2:  name for the second hdf5 group (str; used in printing differences)
+    
+    returns:
+    --------
+    alldiff (bool): True if all attributes present in one group are present in
+                    the other, and their values are the different, otherwise 
+                    False
+    '''
+    alldiff = True
+    kwfmt = {'g1': name1, 'g2': name2}
+    
+    attrs1 = {key: decodeif(val) for key, val in group1.attrs.items()}
+    attrs2 = {key: decodeif(val) for key, val in group2.attrs.items()}
+    
+    keys1 = set(attrs1.keys())
+    keys2 = set(attrs2.keys())
+    keys_only1 = keys1 - keys2
+    keys_only2 = keys2 - keys1
+    keys_both = keys1 & keys2
+    
+    alldiff = alldiff and len(keys_only1) == 0 and len(keys_only2) == 0
+    if len(keys_only1) > 0:
+        print('{g1} contains keys {g2} does not:\n{keys}'.format(\
+              keys=keys_only1, **kwfmt))
+    if len(keys_only2) > 0:
+        print('{g2} contains keys {g1} does not:\n{keys}'.format(\
+              keys=keys_only2, **kwfmt))
+    matchdct = {key: np.all(attrs1[key] != attrs2[key]) for key in keys_both}
+    keymatch = np.all([matchdct[key] for key in matchdct])
+    alldiff &= keymatch
+    if not keymatch:
+        mismatch = {key if not matchdct[key] else None for key in matchdct}
+        mismatch -= {None}
+        print('{g1} and {g2} had the same values for some attributes:'.format(\
+              **kwfmt))
+        for key in mismatch:
+            print('{key}: \t {g1}: {at1} \t {g2}: {at2}'.format(\
+                  key=key, at1=attrs1[key], at2=attrs2[key], **kwfmt))
+    return alldiff
+
 def checksame_arrays(f1, f2, path, name1='file1', name2='file2',\
                      kw_allclose=None):
     '''
@@ -116,8 +166,7 @@ def checksame_arrays(f1, f2, path, name1='file1', name2='file2',\
     return (identical, similar)
     
 def testsame_shortspectra(filen1, filen2, specnums='all',\
-                          name1='file1', name2='file2',
-                          ignore_projection=False):
+                          name1='file1', name2='file2'):
     '''
     test if the specwizard outputs file1 and file2 are the same (for the 
     selected spectra) 
@@ -159,10 +208,6 @@ def testsame_shortspectra(filen1, filen2, specnums='all',\
                          'Projection/x_fraction_array',
                          'Projection/y_fraction_array']
     checksame_arns = ['VHubble_KMpS']
-
-    if ignore_projection:
-        checksame_arns_sn = []
-        checkpaths_attrs.remove('Projection')
     
     sgrps_mass = ['LOSPeculiarVelocity_KMpS',
                   'MetalMassFraction',
