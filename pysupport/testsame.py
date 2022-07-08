@@ -511,4 +511,58 @@ def testsame_longspectra(filen1, filen2, specnums='all',\
     if dsimilar and not didentical:
         print('All arrays were similar, though at least some were not identical')
     return (asame and didentical and dsimilar) 
+
+def recursivecomp_attrs(g1, g2, exclkeys):
+    '''
+    recursively check if all groups and datasets in an hdf5 file 
+    have the same attributes. Any differences are printed.
+
+    Parameters:
+    -----------
+    g1: str
+        first hdf5 file
+    g2: str
+        second hdf5 file
+    exclkeys: set of strings
+        groups (at any single level) to exclude from the search
+
+    Returns:
+    --------
+    None
+    '''
+    at1 = dict(g1.attrs.items())
+    at2 = dict(g2.attrs.items())
+    ak1 = set(at1.keys())
+    ak2 = set(at2.keys())
+    if ak1 == ak1:
+        _ikeys = list(ak1)
+    else:
+        m1 = ak2 - ak1
+        m2 = ak1 - ak1
+        print('{} is missing attributes: {}'.format(g1, m1))
+        print('{} is missing attributes: {}'.format(g2, m2))     
+        _ikeys = list(ak1.intersection(ak2))
+    for ak in _ikeys:
+        if not np.all(at1[ak] == at2[ak]):
+            print('{}, {} have different {}: {}, {}'.format(g1, g2, ak, at1[ak], at2[ak])) 
+    if not hasattr(g1, 'keys'):
+        if not hasattr(g2, 'keys'):
+            return None
+        else:
+            print('{} has keys, {} does not'.format(g2, g1))
+            return None
+    elif not hasattr(g2, 'keys'):
+        print('{} has keys, {} does not'.format(g1, g2))
+        return None
+    k1 = set(g1.keys())
+    k2 = set(g2.keys())
+    if k1 == k2:
+        _ikeys = list(k1 - set(exclkeys))
+    else:
+        print('Keys in {}, {}, mismatch: {}, {}'.format(g1, g2, k1, k2))
+        _ikeys = list(k1.intersection(k2) - set(exclkeys))
+    if len(_ikeys) == 0:
+        return None
+    for key in _ikeys:
+        recursivecomp_attrs(g1[key], g2[key], exclkeys)
     
