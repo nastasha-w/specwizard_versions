@@ -791,3 +791,11 @@ def comparelongspectra_sample():
         comparelongspectrum(z3_l_o, z3_l_n, spec, outname.format(spec))
 
 
+
+def comparespectra_sarah()
+    '''
+    quick visual comparison between the spectra for Sarah Walsh's
+    project before and after the fix.
+    '''
+
+
