@@ -1,5 +1,6 @@
-# specwizard_versions
+# specwizard_versions: DO NOT USE THIS BRANCH 
 This is a repository for storing (and hopefully merging) different versions of specwizard and/or version control for your own copies of it.
+This branch (vbug2) was created to fix a unit error in the velocities for short spectra. (The handling of units based on the data in the EAGLE output files was ok, but the units were recorded incorrectly in those files.) **This branch** has been merged with the [nastasha](https://github.com/nastasha-w/specwizard_versions/tree/nastasha) branch, and **should not be used further**. 
 
 For notes on installing SpecWizard, see the user guide.
 
