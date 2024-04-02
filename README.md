@@ -1,7 +1,10 @@
 
 # specwizard_versions
 This is a repository for storing (and hopefully merging) different versions of specwizard and/or version control for your own copies of it.
-=======
+
+## This branch: FAILED ATTEMPT TO FIX BUG
+This branch is a failed attempt to fix the velocity bug that was eventually addressed with the vbug2 branch, merged into the nastasha branch. This was the first attempt, from the nastasha_quasar branch. **I'd treat this particular branch as radioactive.**
+
 Instructions for compiling SpecWizard:
 --------------------------------------
 
