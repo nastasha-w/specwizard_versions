@@ -1,4 +1,4 @@
-# specwizard_versions
+# specwizard_versions: MOST UP-TO-DATE BRANCH
 This is a repository for storing (and hopefully merging) different versions of specwizard and/or version control for your own copies of it.
 
 For notes on installing SpecWizard, see the user guide.
