@@ -1,7 +1,11 @@
-# specwizard_versions: MOST UP-TO-DATE BRANCH
-This is a repository for storing (and hopefully merging) different versions of specwizard and/or version control for your own copies of it.
+# specwizard_versions: STANDARD FOR THIS REPO, NOT NEWEST VERSION
+This is a repository for storing (and hopefully merging) different versions of specwizard and/or version control for your own copies of it. This branch (`nastasha`) is the one to use from this repository, but I am no longer maintaining this code. The newer version is at https://github.com/specwizard/specwizard .
 
 For notes on installing SpecWizard, see the user guide.
+
+! This Repo does not contain the most up-to-date version of specwizard !
+------------------------------------------------------------------------
+The newer version of this code (in python) by Andrés Arámburo García: https://github.com/specwizard/specwizard
 
 This branch: 
 -----------
